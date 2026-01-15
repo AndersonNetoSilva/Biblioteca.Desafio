@@ -1,0 +1,55 @@
+﻿@page
+@model Biblioteca.WebApp.Areas.Admin.Pages.General.Livros.DetailsModel
+
+@{
+    ViewData["Title"] = "Consultar";
+}
+
+<breadcrumb items="Cadastros, Gerais, Livros, Consultar"></breadcrumb>
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Livro.Titulo)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Livro.Titulo)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Livro.Editora)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Livro.Editora)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Livro.Edicao)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Livro.Edicao)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Livro.Valor)
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Livro.Valor.ToString("C", new System.Globalization.CultureInfo("pt-BR"))
+        </dd>
+        <dt class="col-sm-2">
+            Assuntos
+        </dt>
+        <dd class="col-sm-10">
+            @string.Join(", ", Model.Livro.Assuntos.Select(x => x.Descricao))
+        </dd>
+        <dt class="col-sm-2">
+            Autores
+        </dt>
+        <dd class="col-sm-10">
+            @string.Join(", ", Model.Livro.Autores.Select(x => x.Nome))
+        </dd>
+        <dd class="col-sm-10">
+    </dl>
+</div>
+
+<div class="form-group mt-3 d-flex justify-content-between">
+    <a asp-page="./Edit" asp-route-id="@Model.Livro.Id" class="btn btn-primary">Alterar</a>
+    <a asp-page="./Index" class="btn btn-secondary">Voltar</a>
+</div>

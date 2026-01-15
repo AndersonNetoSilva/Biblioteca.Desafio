@@ -1,0 +1,175 @@
+﻿@using Biblioteca.WebApp.TagHelpers
+@addTagHelper *, Biblioteca.WebApp
+
+@{
+    var menuItems = new List<MenuItem>
+    {
+        new MenuItem { Title = "Home", Url = Url.Page("/Index") },
+        new MenuItem
+        {
+            Title = "Cadastros",
+            Children = new List<MenuItem>
+            {
+                new MenuItem
+                {
+                    Title = "Gerais",
+                    Children = new List<MenuItem>
+                    {
+                        new MenuItem { Title = "Assuntos", Url = "/Admin/General/Assuntos/Index" },
+                        new MenuItem { Title = "Autores", Url = "/Admin/General/Autores/Index" },
+                    }
+                },
+                new MenuItem
+                {
+                    Title = "Livros",
+                    Children = new List<MenuItem>
+                    {
+                        new MenuItem { Title = "Cadastro", Url = "/Admin/Livros/Registro/Index" },
+                        new MenuItem { Title = "Preço de Venda", Url = "/Admin/Livros/PrecosDeVenda/Index" },
+                    }
+                }
+            }
+        },
+        new MenuItem
+        {
+            Title = "Relatórios",
+            Children = new List<MenuItem>
+            {
+                new MenuItem
+                {
+                    Title = "Livros",
+                    Children = new List<MenuItem>
+                    {
+                        new MenuItem { Title = "Autores e Livros", Url = "/Admin/Relatorios/Livros/Index" },
+                    }
+                }
+            }
+        }
+    };
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Biblioteca.WebApp</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Biblioteca.WebApp.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container">
+
+                <div class="flex items-center gap-2 text-wine-900 cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         style="vertical-align:sub!important;"
+                         width="24"
+                         height="24"
+                         viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2"
+                         stroke-linecap="round"
+                         stroke-linejoin="round"
+                         class="lucide lucide-book fill-wine-900"
+                         aria-hidden="true">
+                        <!-- Capa do livro -->
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                        <!-- Lateral da lombada -->
+                        <line x1="9" y1="3" x2="9" y2="21" />
+                        <!-- Linhas de página -->
+                        <line x1="5" y1="7" x2="19" y2="7" />
+                        <line x1="5" y1="11" x2="19" y2="11" />
+                        <line x1="5" y1="15" x2="19" y2="15" />
+                    </svg>
+
+                    <span class="text-2xl font-serif font-bold tracking-tight">
+                        <a class="navbar-brand" asp-area="" asp-page="/Index">Biblioteca.Desafio</a>
+                    </span>
+                </div>
+
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <menu items="menuItems"></menu>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2025 - Biblioteca.WebApp
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // habilita dropdowns normais do Bootstrap
+            var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'))
+            dropdownElementList.map(function (dropdownToggleEl) {
+                return new bootstrap.Dropdown(dropdownToggleEl)
+            });
+
+            // suporte para submenus
+            document.querySelectorAll('.dropdown-submenu .dropdown-toggle').forEach(function (element) {
+                element.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    let submenu = this.nextElementSibling;
+
+                    // fecha outros submenus irmãos
+                    this.closest('.dropdown-menu')
+                        .querySelectorAll('.dropdown-menu.show')
+                        .forEach(function (openMenu) {
+                            if (openMenu !== submenu) {
+                                openMenu.classList.remove('show');
+                            }
+                        });
+
+                    submenu.classList.toggle('show');
+                });
+            });
+
+            // Fechar submenus quando dropdown principal fecha
+            document.querySelectorAll('.dropdown').forEach(function (dropdown) {
+                dropdown.addEventListener('hidden.bs.dropdown', function () {
+                    this.querySelectorAll('.dropdown-menu.show').forEach(function (submenu) {
+                        submenu.classList.remove('show');
+                    });
+                });
+            });
+
+            // Habilitar hover (opcional)?
+            document.querySelectorAll('.dropdown-submenu').forEach(function (submenu) {
+                submenu.addEventListener('mouseenter', function () {
+                    this.querySelector('.dropdown-menu').classList.add('show');
+                });
+                submenu.addEventListener('mouseleave', function () {
+                    this.querySelector('.dropdown-menu').classList.remove('show');
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
