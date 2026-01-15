@@ -1,0 +1,97 @@
+﻿@page
+@model Biblioteca.WebApp.Areas.Admin.Pages.Relatorios.Livros.IndexModel
+
+@{
+    ViewData["Title"] = "Livros";
+}
+
+<style>
+    @@page {
+        size: A4 landscape;
+        margin: 20mm;
+    }
+
+    @@media print {
+        body * {
+            visibility: hidden;
+        }
+
+        #print-area,
+        #print-area * {
+            visibility: visible;
+        }
+
+        #print-area {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+        }
+    }
+</style>
+
+<breadcrumb items="Relatorios, Livros"></breadcrumb>
+
+<!-- filtro -->
+<natural-filter fields="Autor,Livro,Assunto"
+                placeholder="Pesquisar…"
+                example="Título:Gestão de Bibliotecas;Autor:José Saramago"
+                value="@Model.Search">
+</natural-filter>
+
+<button class="btn btn-primary" onclick="window.print()">Imprimir</button>
+
+<!-- Dados -->
+<div id="print-area">
+    <table id="reportTable" class="table mb-3">
+        <thead>
+            <tr>
+                <th>
+                    Autor
+                </th>
+                <th>
+                    Livro
+                </th>
+                <th>
+                    Assunto
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                foreach (var item in Model.ReportLivrosViewList)
+                {
+                    <tr>
+                        <td>
+                            <strong>@Html.DisplayFor(modelItem => item.Autor)</strong>
+                        </td>
+                        <td>
+                        </td>
+                        <td>
+                        </td>
+                    </tr>
+
+                    foreach (var livro in item.Livros)
+                    {
+                        <tr>
+                            <td>
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => livro.Livro)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => livro.Assunto)
+                            </td>
+                        </tr>
+                    }
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Paginação -->
+<pager page="/Admin/General/Autores/Index"
+       page-number="Model.PageNumber"
+       total-pages="Model.TotalPages">
+</pager>

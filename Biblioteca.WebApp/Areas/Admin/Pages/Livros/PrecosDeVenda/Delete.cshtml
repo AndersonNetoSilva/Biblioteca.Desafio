@@ -1,0 +1,42 @@
+﻿@page
+@model Biblioteca.WebApp.Areas.Admin.Pages.General.PrecosDeVenda.DeleteModel
+
+@{
+    ViewData["Title"] = "Excluir";
+}
+
+<breadcrumb items="Cadastros, Gerais, Preços de Venda, Excluir"></breadcrumb>
+
+<div class="alert alert-danger p-3" role="alert">Confirma a Exclusão do Registro?</div>
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.PrecoDeVenda.Livro.Titulo)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.PrecoDeVenda.Livro.Titulo)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.PrecoDeVenda.Valor)
+        </dt>
+        <dd class="col-sm-10">
+            @Model.PrecoDeVenda.Valor.ToString("C", new System.Globalization.CultureInfo("pt-BR"))
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.PrecoDeVenda.Tipo)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.PrecoDeVenda.Tipo)
+        </dd>
+    </dl>
+
+    <form method="post">
+        <input type="hidden" asp-for="PrecoDeVenda.Id" />
+
+        <div class="form-group mt-3 d-flex justify-content-between">
+            <input type="submit" value="Excluir" class="btn btn-danger" />
+            <a asp-page="./Index" class="btn btn-secondary">Voltar</a>
+        </div>
+    </form>
+</div>

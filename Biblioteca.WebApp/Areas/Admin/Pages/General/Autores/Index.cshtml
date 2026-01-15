@@ -1,0 +1,51 @@
+﻿@page
+@model Biblioteca.WebApp.Areas.Admin.Pages.General.Autores.IndexModel
+
+@{
+    ViewData["Title"] = "Autores";
+}
+
+<breadcrumb items="Cadastros, Gerais, Autores"></breadcrumb>
+
+<!-- filtro -->
+<natural-filter fields="Nome"
+                placeholder="Pesquisar…"
+                example="Nome:Antonio Saramago"
+                value="@Model.Search">
+</natural-filter>
+
+<!-- Dados -->
+<table class="table mb-3">
+    <thead>
+        <tr>
+            <action-link-button action="Biblioteca.WebApp.TagHelpers.ButtonActionType.Create">
+            </action-link-button>
+            <th class="text-center text-nowrap" style="width:1%;">
+            </th>
+            <th class="text-center text-nowrap" style="width:1%;">
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Autores[0].Nome)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Autores)
+        {
+            <tr>
+                <action-link-button action="Biblioteca.WebApp.TagHelpers.ButtonActionType.Edit" route-id="@item.Id"></action-link-button>
+                <action-link-button action="Biblioteca.WebApp.TagHelpers.ButtonActionType.Details" route-id="@item.Id"></action-link-button>
+                <action-link-button action="Biblioteca.WebApp.TagHelpers.ButtonActionType.Delete" route-id="@item.Id"></action-link-button>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Nome)
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Paginação -->
+<pager page="/Admin/General/Autores/Index"
+       page-number="Model.PageNumber"
+       total-pages="Model.TotalPages">
+</pager>

@@ -1,0 +1,34 @@
+﻿@page
+@model Biblioteca.WebApp.Areas.Admin.Pages.General.Assuntos.CreateModel
+
+@{
+    ViewData["Title"] = "Inserir";
+}
+
+<breadcrumb items="Cadastros, Gerais, Assunto dos Livros, Inserir"></breadcrumb>
+
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <span class="text-danger">*</span>
+                <label asp-for="Assunto.Descricao" class="control-label"></label>
+                <input asp-for="Assunto.Descricao" class="form-control" />
+                <span asp-validation-for="Assunto.Descricao" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mt-3 d-flex justify-content-between">
+                <input type="submit" value="Gravar" class="btn btn-primary" />
+                <a asp-page="./Index" class="btn btn-secondary">Voltar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

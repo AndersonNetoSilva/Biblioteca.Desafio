@@ -1,0 +1,51 @@
+﻿@page
+@model Biblioteca.WebApp.Areas.Admin.Pages.General.PrecosDeVenda.CreateModel
+
+@{
+    ViewData["Title"] = "Inserir";
+}
+
+<breadcrumb items="Cadastros, Gerais, Preços de Venda, Inserir"></breadcrumb>
+
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <span class="text-danger">*</span>
+                <label asp-for="PrecoDeVenda.LivroId" class="control-label"></label>
+                <select asp-for="PrecoDeVenda.LivroId" class="form-select" asp-items="ViewBag.Livros"></select>
+                <span asp-validation-for="PrecoDeVenda.LivroId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <span class="text-danger">*</span>
+                <label asp-for="PrecoDeVenda.Tipo" class="control-label"></label>
+                <select asp-for="PrecoDeVenda.Tipo"
+                        class="form-select"
+                        asp-items="Html.GetEnumSelectList<Biblioteca.WebApp.Model.TipoDeVenda>()">
+                </select>
+                <span asp-validation-for="PrecoDeVenda.Tipo" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <span class="text-danger">*</span>
+                <label asp-for="PrecoDeVenda.ValorString" class="control-label"></label>
+                <input asp-for="PrecoDeVenda.ValorString" class="form-control" asp-format="{0:C}" />
+                <span asp-validation-for="PrecoDeVenda.ValorString" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mt-3 d-flex justify-content-between">
+                <input type="submit" value="Gravar" class="btn btn-primary" />
+                <a asp-page="./Index" class="btn btn-secondary">Voltar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");        
+    }
+}

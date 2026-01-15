@@ -1,0 +1,44 @@
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Biblioteca.WebApp.Model
+{
+    public class PrecoDeVenda : EntityBase
+    {
+        [Display(Name = "Livro")]
+        public Livro? Livro { get; set; }
+
+        [Required]
+        [ForeignKey(nameof(Livro))]
+        [Display(Name = "Livro")]
+        public required int LivroId { get; set; }
+        public required TipoDeVenda Tipo { get; set; } = TipoDeVenda.Balcao;
+
+        [Required(ErrorMessage = "O valor é obrigatório")]
+        [Display(Name = "Valor")]
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal Valor { get; set; }
+
+        [Required(ErrorMessage = "O valor é obrigatório")]
+        [Display(Name = "Valor")]
+        [NotMapped]
+        public string ValorString { get; set; }
+    }
+
+    public enum TipoDeVenda
+    {
+        [Description("Balcão")]
+        Balcao = 0,
+        [Description("Self-service")]
+        SelfService = 1,
+        [Description("Internet")]
+        Internet = 2,
+        [Description("Evento")]
+        Evento = 3,
+        [Description("Revenda")]
+        Revenda = 4,
+        [Description("Outros")]
+        Outros = 99
+    }
+}

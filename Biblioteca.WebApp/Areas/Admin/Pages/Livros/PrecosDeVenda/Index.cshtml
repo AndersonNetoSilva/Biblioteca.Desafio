@@ -1,0 +1,64 @@
+﻿@page
+@model Biblioteca.WebApp.Areas.Admin.Pages.General.PrecosDeVenda.IndexModel
+
+@{
+    ViewData["Title"] = "Livros";
+}
+
+<breadcrumb items="Cadastros, Gerais, Preços de Venda"></breadcrumb>
+
+<!-- filtro -->
+<natural-filter fields="Descrição"
+                placeholder="Pesquisar…"
+                example="Título:Gestão de Bibliotecas"
+                value="@Model.Search">
+</natural-filter>
+
+<!-- Dados -->
+<table class="table mb-3">
+    <thead>
+        <tr>
+            <action-link-button action="Biblioteca.WebApp.TagHelpers.ButtonActionType.Create">
+            </action-link-button>
+            <th class="text-center text-nowrap" style="width:1%;">
+            </th>
+            <th class="text-center text-nowrap" style="width:1%;">
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PrecosDeVenda[0].Livro.Titulo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PrecosDeVenda[0].ValorString)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PrecosDeVenda[0].Tipo)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.PrecosDeVenda)
+        {
+            <tr>
+                <action-link-button action="Biblioteca.WebApp.TagHelpers.ButtonActionType.Edit" route-id="@item.Id"></action-link-button>
+                <action-link-button action="Biblioteca.WebApp.TagHelpers.ButtonActionType.Details" route-id="@item.Id"></action-link-button>
+                <action-link-button action="Biblioteca.WebApp.TagHelpers.ButtonActionType.Delete" route-id="@item.Id"></action-link-button>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Livro.Titulo)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Tipo)
+                </td>
+
+                <td>
+                    @item.Valor.ToString("C", new System.Globalization.CultureInfo("pt-BR"))
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Paginação -->
+<pager page="/Admin/Livros/Livros/PrecosDeVenda"
+       page-number="Model.PageNumber"
+       total-pages="Model.TotalPages">
+</pager>

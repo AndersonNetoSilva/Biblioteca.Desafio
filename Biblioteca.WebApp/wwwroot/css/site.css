@@ -1,0 +1,101 @@
+﻿html {
+    font-size: 14px;
+}
+
+:root {
+    --cor-fonte-global: #842029;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    margin-bottom: 60px;
+}
+
+.btn-primary:hover {
+    background-color: #842029b0 !important;
+    border-color: #842029b0 !important;
+    color: white !important;
+}
+
+.btn-danger {
+    background-color: #842029 !important;
+    border-color: #842029 !important;
+    color: white !important;
+}
+
+    .btn-danger:hover {
+        background-color: #842029b0 !important;
+        border-color: #842029b0 !important;
+        color: white !important;
+    }
+
+.natural-filter-chip {
+    cursor: pointer;
+}
+
+    .natural-filter-chip:hover {
+        background-color: var(--bs-primary);
+    }
+
+/* === Submenu: remover caret padrão e colocar seta personalizada === */
+
+/* POSICIONAMENTO DO SUBMENU (abre ao lado e não para baixo) */
+.dropdown-submenu {
+    position: relative;
+}
+
+    .dropdown-submenu > .dropdown-menu {
+        top: 0 !important; /* alinha com o item pai */
+        left: 100% !important; /* abre para a direita */
+        margin-top: -0.25rem !important;
+        margin-left: 0 !important;
+        position: absolute !important;
+    }
+
+        /* Quando o submenu estiver visível, garantir z-index alto */
+        .dropdown-submenu > .dropdown-menu.show {
+            display: block;
+            z-index: 9999;
+        }
+
+/* Ajuste para evitar que o submenu se sobreponha ao menu principal */
+.navbar-nav .dropdown-menu {
+    z-index: 1000;
+}
+
+/* Mobile: submenus abrem para baixo */
+@media (max-width: 991.98px) {
+    .dropdown-submenu > .dropdown-menu {
+        left: 0 !important;
+        top: 100% !important;
+        margin-left: 0;
+        margin-top: 0.25rem;
+    }
+}
+
+/* Alinha a seta à direita dentro do item */
+.dropdown-item.dropdown-toggle {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding-right: 1.5rem !important; /* espaço para respirar */
+}
+
+    /* Ajuste opcional para deixar a seta mais discreta */
+    .dropdown-item.dropdown-toggle::after {
+        margin-left: .5rem !important;
+    }
