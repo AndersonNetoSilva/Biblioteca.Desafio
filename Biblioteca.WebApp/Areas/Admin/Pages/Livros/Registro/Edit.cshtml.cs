@@ -1,6 +1,7 @@
 ﻿using Biblioteca.WebApp.Infrastructure.Abstractions.Repositories;
 using Biblioteca.WebApp.Infrastructure.Extensions;
 using Biblioteca.WebApp.Infrastructure.Pages;
+using Biblioteca.WebApp.Infrastructure.Repositories;
 using Biblioteca.WebApp.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -14,14 +15,27 @@ namespace Biblioteca.WebApp.Areas.Admin.Pages.General.Livros
 
         private readonly IAssuntoRepository _assuntoRepository;
 
+        //[Gustavo Viegas 2026/01/30] 
+        //Atributo Privado para o Repositório do Detalhe pra Poder Recuperar a Lista com Mais Facilidade ao Gravar.
+        //Tem outras formas de Fazer, esse é bem Prática
+        private readonly IPrecoDeVendaRepository _precoDeVendaRepository;
+
+
+        //[Gustavo Viegas 2026/01/30] 
+        //Injeta o Repositório do Detalhe pra Poder Recuperar a Lista com Mais Facilidade ao Gravar.       
         public EditModel(ILivroRepository repository,
             IAutorRepository autorRepository,
             IAssuntoRepository assuntoRepository,
+            IPrecoDeVendaRepository precoDeVendaRepository,
             IUnitOfWork unitOfWork)
             : base(repository, unitOfWork)
         {
             _autorRepository = autorRepository;
             _assuntoRepository = assuntoRepository;
+
+            //[Gustavo Viegas 2026/01/30] 
+            //Injeta o Repositório do Detalhe pra Poder Recuperar a Lista com Mais Facilidade ao Gravar.       
+            _precoDeVendaRepository = precoDeVendaRepository;   
         }
 
         #region SelectLists
@@ -56,6 +70,11 @@ namespace Biblioteca.WebApp.Areas.Admin.Pages.General.Livros
         [BindProperty]
         public Livro Livro { get; set; } = default!;
 
+        //[Gustavo Viegas 2026/01/30] 
+        //Lista de Detalhe. Bindable. Usada para Preencher o Grid de Detalhe.
+        [BindProperty]
+        public List<PrecoDeVendaVM> Precos { get; set; } = new();
+
         public async Task<IActionResult> OnGetAsync(int? id)
         {
             if (id == null)
@@ -63,11 +82,14 @@ namespace Biblioteca.WebApp.Areas.Admin.Pages.General.Livros
                 return NotFound();
             }
 
+            //[Gustavo Viegas 2026/01/30]
+            //Include da Lista de Detalhe pra Poder Preencher o Grid
             var livro = await _repository
                                 .Query()
                                 .Where(x => x.Id == id.Value)
                                 .Include(x => x.Autores)
                                 .Include(x => x.Assuntos)
+                                .Include(x => x.PrecosDeVenda)
                                 .FirstOrDefaultAsync();
 
             if (livro == null)
@@ -76,6 +98,18 @@ namespace Biblioteca.WebApp.Areas.Admin.Pages.General.Livros
             }
 
             livro.ValorString = livro.Valor.ToString("C", new System.Globalization.CultureInfo("pt-BR"));
+
+            //[Gustavo Viegas 2026/01/30]
+            //Popula o Atributo da Lista de Detalhe com o que está Gravado na Entidade.
+            //Esse atributo Precos é usado para Preencher o Grid e Pegar os Valores Editados de Volta
+            Precos = livro.PrecosDeVenda
+                .Select(p => new PrecoDeVendaVM
+                {
+                    Id = p.Id,
+                    Tipo = p.Tipo,
+                    ValorString = p.Valor.ToString("N2")
+                })
+                .ToList();
 
             Livro = livro;
 
@@ -104,6 +138,47 @@ namespace Biblioteca.WebApp.Areas.Admin.Pages.General.Livros
             Livro.Valor = valorDecimal;
             Livro.Autores = _autorRepository.Query().Where(a => AutorIds.Contains(a.Id)).ToList();
             Livro.Assuntos = _assuntoRepository.Query().Where(a => AssuntoIds.Contains(a.Id)).ToList();
+
+            //[Gustavo Viegas 2026/01/30]
+            //Recupera os Detalhes já Gravados
+            Livro.PrecosDeVenda = _precoDeVendaRepository
+                                    .Query()
+                                    .Where(x => x.LivroId == Livro.Id)
+                                    .ToList();
+
+            //[Gustavo Viegas 2026/01/30]
+            //Pega o que veio da Página
+            var idsPostados = Precos.Where(p => p.Id.HasValue).Select(p => p.Id.Value).ToList();
+
+
+            //[Gustavo Viegas 2026/01/30]
+            //Exclui o que não está na Página
+            Livro.PrecosDeVenda
+                .RemoveAll(p => !idsPostados.Contains(p.Id));
+
+            //[Gustavo Viegas 2026/01/30]
+            //Percorre a partir do que veio da Página, inclui ou alterada para que seja gravado o que está na página
+            foreach (var vm in Precos)
+            {
+                if (!ModelState.TryParseValor("", vm.ValorString, out var valor))
+                    continue;
+
+                var preco = Livro.PrecosDeVenda.FirstOrDefault(p => p.Id == (vm.Id ?? 0));
+
+                if (preco != null)
+                {
+                    preco.Tipo = vm.Tipo;
+                    preco.Valor = valor;
+                }
+                else
+                {
+                    Livro.PrecosDeVenda.Add(new PrecoDeVenda
+                    {
+                        Tipo = vm.Tipo,
+                        Valor = valor
+                    });
+                }
+            }
 
             try
             {

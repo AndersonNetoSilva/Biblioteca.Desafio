@@ -9,10 +9,13 @@ namespace Biblioteca.WebApp.Model
         [Display(Name = "Livro")]
         public Livro? Livro { get; set; }
 
+
+        //[Gustavo Viegas 2026/01/30]
+        //No modelo de Detalhe o Identificador do mestre não pode ser required
         [Required]
         [ForeignKey(nameof(Livro))]
         [Display(Name = "Livro")]
-        public required int LivroId { get; set; }
+        public int LivroId { get; set; }
         public required TipoDeVenda Tipo { get; set; } = TipoDeVenda.Balcao;
 
         [Required(ErrorMessage = "O valor é obrigatório")]
@@ -40,5 +43,12 @@ namespace Biblioteca.WebApp.Model
         Revenda = 4,
         [Description("Outros")]
         Outros = 99
+    }
+
+    public class PrecoDeVendaVM
+    {
+        public int? Id { get; set; }
+        public TipoDeVenda Tipo { get; set; }
+        public string ValorString { get; set; }
     }
 }

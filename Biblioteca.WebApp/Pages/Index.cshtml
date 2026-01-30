@@ -1,9 +1,108 @@
 ﻿@page
 @model IndexModel
+
 @{
     ViewData["Title"] = "Home page";
 }
 
+@section Scripts
+{
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
+
+    <script type="text/javascript">
+
+        function drawAutoresPorLivroChart() {
+                var chartData = @Html.Raw(Json.Serialize(Model.AutoresPorLivroList))
+
+                Morris.Line({
+                    element: 'chart-AutoresPorLivro',
+                    data: chartData,
+                    xkey: 'livro',
+                    ykeys: ['quantidade'],
+                    labels: ['Total de Autores'],
+                    parseTime: false,
+                    hideHover: "auto",
+                    xLabelAngle: 60,
+                    lineColors: ['#2ECC71', '#0B62A4']
+                });
+            };
+
+        function drawAutoresPorLivroDonutsChart()
+        {
+            var chartData = @Html.Raw(Json.Serialize(Model.DonutsModeList))
+
+            Morris.Donut({
+                element: 'chart-AutoresPorLivroDonuts',
+                data: chartData,
+                formatter: function (y) { return y }
+            });
+        }
+
+        $(document).ready(function () {
+                    drawAutoresPorLivroChart();
+                    drawAutoresPorLivroDonutsChart();
+                })
+    </script>
+}
+
 <div class="text-center">
     <h1 class="display-4">Bem-vindo!</h1>
+</div>
+
+<div class="row margin-bottom-20">
+    <div class="col-md-12">
+            <div id="chart-AutoresPorLivro" style="height:200px!important;"></div>
+    </div>
+</div>
+
+<div class="row margin-bottom-20" style="margin-top:20px!important;">
+    <div class="col-md-12">
+        <div class="row servive-block margin-bottom-10">
+            <div class="col-md-8 col-sm-6">
+                <div id="chart-AutoresPorLivroDonuts" style="height:200px!important;"></div>
+            </div>
+
+            <div class="col-md-4 col-sm-6">
+                <div>
+                    <div class=" panel panel-default">
+                        <div class="panel-heading">
+                            <i class="fa fa-bell fa-fw"></i> Painel de Notificações
+                        </div>
+                        <!-- /.panel-heading -->
+                        <div class="panel-body">
+                            <div class="list-group">
+                                <a href="#" class="list-group-item">
+                                    <i class="icon-envelope"></i> Aniversariantes do Mês
+                                    <span class="pull-right text-muted small">
+                                        <em>@Model.Notificacoes.AniversariantesDoMes</em>
+                                    </span>
+                                </a>
+                                <a href="#" class="list-group-item">
+                                    <i class="icon-magic"></i> Evento confirmado
+                                    <span class="pull-right text-muted small">
+                                        <em>há 12 minutos</em>
+                                    </span>
+                                </a>
+                                <a href="#" class="list-group-item">
+                                    <i class="icon-paperclip"></i> Contrato gerado
+                                    <span class="pull-right text-muted small">
+                                        <em>há 27 minutos</em>
+                                    </span>
+                                </a>
+                                <a href="#" class="list-group-item">
+                                    <i class="icon-bar-chart"></i> Solicitação de revisão
+                                    <span class="pull-right text-muted small">
+                                        <em>há 43 minutos</em>
+                                    </span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

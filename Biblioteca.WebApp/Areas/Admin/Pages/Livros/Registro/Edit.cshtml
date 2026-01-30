@@ -8,48 +8,119 @@
 <breadcrumb items="Cadastros, Gerais, Livros, Alterar"></breadcrumb>
 
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-12">
         <form method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-            <div class="form-group">
-                <span class="text-danger">*</span>
-                <label asp-for="Livro.Titulo" class="control-label"></label>
-                <input asp-for="Livro.Titulo" class="form-control" />
-                <span asp-validation-for="Livro.Titulo" class="text-danger"></span>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <span class="text-danger">*</span>
+                        <label asp-for="Livro.Titulo" class="control-label"></label>
+                        <input asp-for="Livro.Titulo" class="form-control" />
+                        <span asp-validation-for="Livro.Titulo" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <span class="text-danger">*</span>
+                        <label asp-for="Livro.Editora" class="control-label"></label>
+                        <input asp-for="Livro.Editora" class="form-control" />
+                        <span asp-validation-for="Livro.Editora" class="text-danger"></span>
+                    </div>
+                </div>
             </div>
 
-            <div class="form-group">
-                <span class="text-danger">*</span>
-                <label asp-for="Livro.Editora" class="control-label"></label>
-                <input asp-for="Livro.Editora" class="form-control" />
-                <span asp-validation-for="Livro.Editora" class="text-danger"></span>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <span class="text-danger">*</span>
+                        <label asp-for="Livro.Edicao" class="control-label"></label>
+                        <input asp-for="Livro.Edicao" class="form-control" />
+                        <span asp-validation-for="Livro.Edicao" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <span class="text-danger">*</span>
+                        <label asp-for="Livro.ValorString" class="control-label"></label>
+                        <input asp-for="Livro.ValorString" class="form-control" asp-format="{0:C}" />
+                        <span asp-validation-for="Livro.ValorString" class="text-danger"></span>
+                    </div>
+                </div>
             </div>
 
-            <div class="form-group">
-                <span class="text-danger">*</span>
-                <label asp-for="Livro.Edicao" class="control-label"></label>
-                <input asp-for="Livro.Edicao" class="form-control" />
-                <span asp-validation-for="Livro.Edicao" class="text-danger"></span>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Autores</label>
+                        <select asp-for="AutorIds" asp-items="Model.Autores" multiple class="form-control"></select>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Assuntos</label>
+                        <select asp-for="AssuntoIds" asp-items="Model.Assuntos" multiple class="form-control"></select>
+                    </div>
+                </div>
             </div>
 
-            <div class="form-group"> 
-                <span class="text-danger">*</span>
-                <label asp-for="Livro.ValorString" class="control-label"></label>
-                <input asp-for="Livro.ValorString" class="form-control" asp-format="{0:C}" />
-                <span asp-validation-for="Livro.ValorString" class="text-danger"></span>
+            @*
+                [Gustavo Viegas 2026 / 01 / 30] 
+                Grid de Detalhe com os botões de Incluir e Excluir já estilizados
+                Faz o loop (for) no atributo do detalhe definido no Model
+                A Exclusão remove direto a linha da tabela. Vide onclick do Delete
+                A inclusão chama o Java Script adicionarLinha. Vide comentário.
+                A alteração é na Própria Tabela
+                Essa é uma das formas de Fazer, talvez a mais simples.
+            *@
+            <div class="row">
+                <div class="col-md-12">
+                    <h5 class="mt-4">Preços de Venda</h5>
+
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <button type="button" class="btn btn-outline-primary btn-sm p-1"
+                                            onclick="adicionarLinha()">
+                                        <i class="bi bi-plus-circle"></i>
+                                    </button>
+                                </th>
+                                <th>Tipo</th>
+                                <th>Valor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.Precos.Count; i++)
+                            {
+                                <tr>
+                                    <td>
+                                        <button type="button" class="btn btn-outline-danger btn-sm p-1"
+                                                onclick="this.closest('tr').remove()">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                        <input type="hidden" asp-for="Precos[@i].Id" />
+                                    </td>
+                                    <td>
+                                        <select asp-for="Precos[@i].Tipo"
+                                                asp-items="Html.GetEnumSelectList<Biblioteca.WebApp.Model.TipoDeVenda>()"
+                                                class="form-select">
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input asp-for="Precos[@i].ValorString" class="form-control" />
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
-            <div class="form-group">
-                <label>Autores</label>
-                <select asp-for="AutorIds" asp-items="Model.Autores" multiple class="form-control"></select>
-            </div>
-
-            <div class="form-group">
-                <label>Assuntos</label>
-                <select asp-for="AssuntoIds" asp-items="Model.Assuntos" multiple class="form-control"></select>
-            </div>
-            
             <input type="hidden" asp-for="Livro.Id" />
 
             <div class="form-group mt-3 d-flex justify-content-between">
@@ -65,4 +136,45 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+
+    @*
+        [Gustavo Viegas 2026 / 01 / 30] 
+        Java Script para Incluir um novo Registro
+    *@
+    <script>
+            let contador = @Model.Precos.Count;
+
+            const tipoOptions = `@Html.Raw(string.Join("",
+                                            Enum.GetValues(typeof(Biblioteca.WebApp.Model.TipoDeVenda))
+                                                            .Cast<Biblioteca.WebApp.Model.TipoDeVenda>()
+                                                            .Select(e => $"<option value='{(int)e}'>{e}</option>")
+                            ))`;
+
+            function adicionarLinha() {
+                const tbody = document.querySelector('table tbody');
+
+                        const novaLinha = document.createElement('tr');
+                        novaLinha.innerHTML = `
+                            <td>
+                                <button type="button" class="btn btn-outline-danger btn-sm p-1"
+                                        onclick="this.closest('tr').remove()">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                                <input type="hidden" name="Precos[${contador}].Id" value="0" />
+                            </td>
+                            <td>
+                                <select name="Precos[${contador}].Tipo" class="form-select">
+                                    ${tipoOptions}
+                                </select>
+                            </td>
+                            <td>
+                                <input name="Precos[${contador}].ValorString" class="form-control" />
+                            </td>
+                        `;
+
+                        tbody.appendChild(novaLinha);
+                        contador++;
+                    }
+    </script>
 }

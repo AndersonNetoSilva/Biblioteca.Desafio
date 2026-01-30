@@ -25,7 +25,7 @@ namespace Biblioteca.WebApp.Infrastructure.Extensions
             owner = owner.Replace("R$", string.Empty).Trim();
 
             // Regex pt-BR: aceita pontos como milhar e vírgula como decimal
-            var regex = new Regex(@"^\d{1,3}(\.\d{3})*(,\d{2})$|^\d+(,\d{2})$");
+            var regex = new Regex(@"^\d{1,3}(\.\d{3})*(,\d{2})$|^\d+(,\d{1,2})?$");
 
             if (!regex.IsMatch(owner))
             {
