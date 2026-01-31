@@ -14,57 +14,57 @@
 
             <div class="row">
                 <div class="col-md-6">
-                    <div class="form-group">
-                        <span class="text-danger">*</span>
-                        <label asp-for="Livro.Titulo" class="control-label"></label>
-                        <input asp-for="Livro.Titulo" class="form-control" />
-                        <span asp-validation-for="Livro.Titulo" class="text-danger"></span>
-                    </div>
+            <div class="form-group">
+                <span class="text-danger">*</span>
+                <label asp-for="Livro.Titulo" class="control-label"></label>
+                <input asp-for="Livro.Titulo" class="form-control" />
+                <span asp-validation-for="Livro.Titulo" class="text-danger"></span>
+            </div>
                 </div>
 
                 <div class="col-md-6">
-                    <div class="form-group">
-                        <span class="text-danger">*</span>
-                        <label asp-for="Livro.Editora" class="control-label"></label>
-                        <input asp-for="Livro.Editora" class="form-control" />
-                        <span asp-validation-for="Livro.Editora" class="text-danger"></span>
-                    </div>
+            <div class="form-group">
+                <span class="text-danger">*</span>
+                <label asp-for="Livro.Editora" class="control-label"></label>
+                <input asp-for="Livro.Editora" class="form-control" />
+                <span asp-validation-for="Livro.Editora" class="text-danger"></span>
+            </div>
                 </div>
             </div>
 
             <div class="row">
                 <div class="col-md-6">
-                    <div class="form-group">
-                        <span class="text-danger">*</span>
-                        <label asp-for="Livro.Edicao" class="control-label"></label>
-                        <input asp-for="Livro.Edicao" class="form-control" />
-                        <span asp-validation-for="Livro.Edicao" class="text-danger"></span>
-                    </div>
+            <div class="form-group">
+                <span class="text-danger">*</span>
+                <label asp-for="Livro.Edicao" class="control-label"></label>
+                <input asp-for="Livro.Edicao" class="form-control" />
+                <span asp-validation-for="Livro.Edicao" class="text-danger"></span>
+            </div>
                 </div>
 
                 <div class="col-md-6">
-                    <div class="form-group">
-                        <span class="text-danger">*</span>
-                        <label asp-for="Livro.ValorString" class="control-label"></label>
-                        <input asp-for="Livro.ValorString" class="form-control" asp-format="{0:C}" />
-                        <span asp-validation-for="Livro.ValorString" class="text-danger"></span>
-                    </div>
+            <div class="form-group"> 
+                <span class="text-danger">*</span>
+                <label asp-for="Livro.ValorString" class="control-label"></label>
+                <input asp-for="Livro.ValorString" class="form-control" asp-format="{0:C}" />
+                <span asp-validation-for="Livro.ValorString" class="text-danger"></span>
+            </div>
                 </div>
             </div>
 
             <div class="row">
                 <div class="col-md-6">
-                    <div class="form-group">
-                        <label>Autores</label>
-                        <select asp-for="AutorIds" asp-items="Model.Autores" multiple class="form-control"></select>
-                    </div>
+            <div class="form-group">
+                <label>Autores</label>
+                <select asp-for="AutorIds" asp-items="Model.Autores" multiple class="form-control"></select>
+            </div>
                 </div>
 
                 <div class="col-md-6">
-                    <div class="form-group">
-                        <label>Assuntos</label>
-                        <select asp-for="AssuntoIds" asp-items="Model.Assuntos" multiple class="form-control"></select>
-                    </div>
+            <div class="form-group">
+                <label>Assuntos</label>
+                <select asp-for="AssuntoIds" asp-items="Model.Assuntos" multiple class="form-control"></select>
+            </div>
                 </div>
             </div>
 
@@ -120,7 +120,7 @@
                     </table>
                 </div>
             </div>
-
+            
             <input type="hidden" asp-for="Livro.Id" />
 
             <div class="form-group mt-3 d-flex justify-content-between">
