@@ -1,5 +1,6 @@
 ﻿using Biblioteca.WebApp.Infrastructure.Abstractions.Repositories;
-using Biblioteca.WebApp.Infrastructure.Extensions;
+using Biblioteca.WebApp.Infrastructure.Abstractions.Services;
+using Biblioteca.WebApp.Infrastructure.Exceptions;
 using Biblioteca.WebApp.Infrastructure.Pages;
 using Biblioteca.WebApp.Model;
 using Microsoft.AspNetCore.Mvc;
@@ -13,12 +14,17 @@ namespace Biblioteca.WebApp.Areas.Admin.Pages.General.Livros
 
         private readonly IAssuntoRepository _assuntoRepository;
 
+        private readonly ILivroService _livroService;
+
         public CreateModel(ILivroRepository repository,
+            ILivroService livroService,
             IAutorRepository autorRepository,
             IAssuntoRepository assuntoRepository,
             IUnitOfWork unitOfWork)
             : base(repository, unitOfWork)
         {
+            _livroService = livroService;
+
             _autorRepository = autorRepository;
             _assuntoRepository = assuntoRepository;
         }
@@ -26,11 +32,6 @@ namespace Biblioteca.WebApp.Areas.Admin.Pages.General.Livros
         public IActionResult OnGet()
         {
             BindSelectLists();
-
-            //[Gustavo Viegas 2026/01/30] 
-            //Iniciliza o Grid de Detalhe com uma Linha
-            //Opcional mas útil para Detalhes Obrigatórios. Mais fácil de validar.
-            Precos.Add(new PrecoDeVendaVM());
 
             return Page();
         }
@@ -64,52 +65,36 @@ namespace Biblioteca.WebApp.Areas.Admin.Pages.General.Livros
         [BindProperty]
         public Livro Livro { get; set; } = default!;
 
-        //[Gustavo Viegas 2026/01/30] 
-        //Lista de Detalhe. Bindable. Usada para Preencher o Grid de Detalhe.
         [BindProperty]
-        public List<PrecoDeVendaVM> Precos { get; set; } = new();
+        public List<PrecoDeVendaVM> PrecosDeVenda { get; set; } = new();
 
         // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
         {
-            BindSelectLists();
-
             if (!ModelState.IsValid)
             {
+                BindSelectLists();
                 return Page();
             }
 
-            if (!ModelState.TryParseValor("Livro.ValorString", Livro.ValorString, out var valorDecimal))
+            try
             {
-                ModelState.AddModelError("Livro.ValorString", "Valor inválido.");
+                await _livroService.AddAsync(Livro, AutorIds, AssuntoIds, PrecosDeVenda);
+            }
+            catch (KeyNotFoundException)
+            {
+                BindSelectLists();
+                return NotFound();
+            }
+            catch (ValidationListException ex)
+            {
+                BindSelectLists();
+
+                foreach (var error in ex.Errors)
+                    ModelState.AddModelError(error.Key, error.Value);
+
                 return Page();
             }
-
-            Livro.Valor = valorDecimal;
-            Livro.Autores = _autorRepository.Query().Where(a => AutorIds.Contains(a.Id)).ToList();
-            Livro.Assuntos = _assuntoRepository.Query().Where(a => AssuntoIds.Contains(a.Id)).ToList();
-
-            //[Gustavo Viegas 2026/01/30] 
-            //Percorre a Lista de Detalhe, Atualizar o Valor (por conta da formatação) e dá um ADD na Lista de Detalhe com o que veio da Página.
-            //Aqui vai ser sempre ADD pois a página é só de Create.
-            foreach (var precoVm in Precos)
-            {
-                if (!ModelState.TryParseValor("", precoVm.ValorString, out var valor))
-                {
-                    ModelState.AddModelError("", "Valor de preço inválido.");
-                    return Page();
-                }
-
-                Livro.PrecosDeVenda.Add(new PrecoDeVenda
-                {
-                    Tipo = precoVm.Tipo,
-                    Valor = valor
-                });
-            }
-
-            _repository.Add(Livro);
-
-            await _unitOfWork.CommitAsync();
 
             return RedirectToPage("./Index");
         }

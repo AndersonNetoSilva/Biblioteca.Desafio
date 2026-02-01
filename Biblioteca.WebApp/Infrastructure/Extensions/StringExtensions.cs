@@ -44,5 +44,23 @@ namespace Biblioteca.WebApp.Infrastructure.Extensions
 
             return true;
         }
+
+        public static bool TryParseValor(
+                    this string owner,
+                    out string errorMessage,
+                    out decimal valorDecimal)
+        {
+            valorDecimal = 0m;
+
+            errorMessage = string.Empty;
+
+            if (string.IsNullOrWhiteSpace(owner))
+                errorMessage = "O valor é obrigatório.";
+            else
+                if (!owner.TryParseValor(out valorDecimal))
+                    errorMessage = "Formato inválido. Use 10,50 ou 1.020,25";
+
+            return string.IsNullOrWhiteSpace(errorMessage);
+        }
     }
 }

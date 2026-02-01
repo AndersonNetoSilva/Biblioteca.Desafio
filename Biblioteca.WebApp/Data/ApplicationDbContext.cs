@@ -46,9 +46,6 @@ namespace Biblioteca.WebApp.Data
                 entity.ToView("vw_ReportLivros");
             });
 
-            //[Gustavo Viegas 2026/01/30]
-            //Define o Relacionamento mo objeto de Detalhe
-            //A Lista fica no Pai, mas o Relacionamento deve ser definido aqui também!
             builder.Entity<PrecoDeVenda>()
                 .HasOne(p => p.Livro)
                 .WithMany(l => l.PrecosDeVenda)

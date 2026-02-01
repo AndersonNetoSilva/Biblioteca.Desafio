@@ -9,9 +9,6 @@ namespace Biblioteca.WebApp.Model
         [Display(Name = "Livro")]
         public Livro? Livro { get; set; }
 
-
-        //[Gustavo Viegas 2026/01/30]
-        //No modelo de Detalhe o Identificador do mestre não pode ser required
         [Required]
         [ForeignKey(nameof(Livro))]
         [Display(Name = "Livro")]
@@ -45,10 +42,16 @@ namespace Biblioteca.WebApp.Model
         Outros = 99
     }
 
-    public class PrecoDeVendaVM
+    public class PrecoDeVendaVM: IPermiteMarcarParaExclusao
     {
         public int? Id { get; set; }
         public TipoDeVenda Tipo { get; set; }
         public string ValorString { get; set; }
+        public bool MarcadoParaExclusao { get; set; } = false;
+    }
+
+    public interface IPermiteMarcarParaExclusao
+    {
+        bool MarcadoParaExclusao { get; set; }
     }
 }

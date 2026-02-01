@@ -33,8 +33,6 @@ namespace Biblioteca.WebApp.Model
         
         public List<Assunto> Assuntos { get; set; } = new();
 
-        //[Gustavo Viegas 2026/01/30]
-        //Inclui a Lista de Detalhe no Modelo do Mestre
         public List<PrecoDeVenda> PrecosDeVenda { get; set; } = new();
     }
 }

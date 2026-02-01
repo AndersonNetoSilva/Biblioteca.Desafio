@@ -14,6 +14,7 @@ namespace Biblioteca.WebApp.Infrastructure.Extensions
             services.AddTransient<IReportService, ReportService>();
 
             // Repositórios
+            services.AddScoped<ILivroService, LivroService>();
             services.AddScoped<IAssuntoRepository, AssuntoRepository>();
             services.AddScoped<IAutorRepository, AutorRepository>();
             services.AddScoped<ILivroRepository, LivroRepository>();
