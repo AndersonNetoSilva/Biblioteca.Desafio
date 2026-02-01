@@ -20,6 +20,7 @@ namespace Biblioteca.WebApp.Infrastructure.Repositories
                 .Include(x => x.Autores)
                 .Include(x => x.Assuntos)
                 .Include(x => x.PrecosDeVenda)
+                .Include(x => x.ArquivoCapa)
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
     }

@@ -34,9 +34,15 @@ namespace Biblioteca.WebApp.Infrastructure.Services
             Livro livro,
             IEnumerable<int> autorIds,
             IEnumerable<int> assuntoIds,
-            IEnumerable<PrecoDeVendaVM> precosDeVenda)
+            IEnumerable<PrecoDeVendaVM> precosDeVenda,
+            ArquivoVM? fotoDaCapa = null)
         {
             ValidarValor(livro);
+
+            if (fotoDaCapa?.Arquivo != null && fotoDaCapa.Arquivo.Length > 0)
+            {
+                await SalvarOuSubstituirCapaAsync(livro, fotoDaCapa);
+            }
 
             _livroRepository.Add(livro);
 
@@ -47,8 +53,40 @@ namespace Biblioteca.WebApp.Infrastructure.Services
             await _unitOfWork.CommitAsync();
         }
 
+        private async Task SalvarOuSubstituirCapaAsync(Livro livro, ArquivoVM fotoDaCapa)
+        {
+            if (fotoDaCapa?.Arquivo == null) return;
+
+            using var ms = new MemoryStream();
+
+            await fotoDaCapa.Arquivo.CopyToAsync(ms);
+
+            if (livro.ArquivoCapaId != null)
+            {
+                livro.ArquivoCapa = _dbContext.Arquivos.First(x => x.Id == livro.ArquivoCapaId);
+
+                livro.ArquivoCapa.Conteudo = ms.ToArray();
+                livro.ArquivoCapa.ContentType = fotoDaCapa.Arquivo.ContentType;
+                livro.ArquivoCapa.Tamanho = (int)fotoDaCapa.Arquivo.Length;
+                livro.ArquivoCapa.NomeOriginal = fotoDaCapa.Arquivo.FileName;
+                livro.ArquivoCapa.Descricao = fotoDaCapa.Descricao ?? fotoDaCapa.Arquivo.FileName;
+                livro.ArquivoCapa.DataUltimaAlteracao = DateTime.UtcNow;
+            }
+            else
+            {
+                livro.ArquivoCapa = new Arquivo
+                {
+                    Conteudo = ms.ToArray(),
+                    ContentType = fotoDaCapa.Arquivo.ContentType,
+                    Tamanho = (int)fotoDaCapa.Arquivo.Length,
+                    NomeOriginal = fotoDaCapa.Arquivo.FileName,
+                    Descricao = fotoDaCapa.Descricao ?? fotoDaCapa.Arquivo.FileName,
+                };
+            }
+        }
+
         public async Task UpdateAsync(Livro Livro, IEnumerable<int> autorIds, IEnumerable<int> assuntoIds,
-            IEnumerable<PrecoDeVendaVM> precosDeVenda)
+            IEnumerable<PrecoDeVendaVM> precosDeVenda, ArquivoVM? fotoDaCapa = null)
         {
             var livro = await _livroRepository.GetForUpdateAsync(Livro.Id);
 
@@ -57,6 +95,11 @@ namespace Biblioteca.WebApp.Infrastructure.Services
                 ValidarValor(Livro);
 
                 _dbContext.Entry(livro).CurrentValues.SetValues(Livro);
+
+                if (fotoDaCapa?.Arquivo != null && fotoDaCapa.Arquivo.Length > 0)
+                {
+                    await SalvarOuSubstituirCapaAsync(livro, fotoDaCapa);
+                }
 
                 await SyncAutoresAsync(livro, autorIds);
                 await SyncAssuntosAsync(livro, assuntoIds);

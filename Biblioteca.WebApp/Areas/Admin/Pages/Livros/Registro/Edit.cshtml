@@ -9,7 +9,7 @@
 
 <div class="row">
     <div class="col-md-12">
-        <form method="post">
+        <form method="post" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div class="row">
@@ -71,6 +71,29 @@
             </div>
 
             <div class="row">
+                <div class="col-md-6 mb3">
+                    <label asp-for="FotoDaCapa.Arquivo" class="form-label"></label>
+                    <input asp-for="FotoDaCapa.Arquivo"
+                           type="file"
+                           class="form-control"
+                           accept="image/*" />
+                    <span asp-validation-for="FotoDaCapa.Arquivo" class="text-danger"></span>
+                </div>
+
+                @if (Model.FotoDaCapa != null)
+                {
+                    <div class="col-md-4 d-flex flex-column">
+                        <label class="form-label">Conteúdo do Arquivo</label>
+                        <img src="@Url.Page(null, "ConteudoDoArquivoDaCapa", new { livroId = Model.Livro.Id })"
+                             class="img-thumbnail img-fluid align-self-start mt-2"
+                             style="max-height: 150px; width: auto; cursor: zoom-in;"
+                             data-bs-toggle="modal"
+                             data-bs-target="#modalImagemCapa" />
+                    </div>
+                }
+            </div>
+
+            <div class="row">
                 <div class="col-md-12">
                     <h5 class="mt-4">Preços de Venda</h5>
 
@@ -118,6 +141,7 @@
             </div>
 
             <input type="hidden" asp-for="Livro.Id" />
+            <input type="hidden" asp-for="Livro.ArquivoCapaId" />
 
             <div class="form-group mt-3 d-flex justify-content-between">
                 <input type="submit" value="Gravar" class="btn btn-primary" />
@@ -125,6 +149,23 @@
                 <a asp-page="./Index" class="btn btn-secondary">Voltar</a>
             </div>
         </form>
+    </div>
+</div>
+
+<div class="modal fade" id="modalImagemCapa" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-transparent border-0 d-flex justify-content-center">
+            <button type="button"
+                    class="btn-close btn-close-white position-absolute top-0 end-0 m-3"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+
+            <img src="@Url.Page(null, "ConteudoDoArquivoDaCapa", new { livroId = Model.Livro.Id })"
+                 @* class="img-fluid rounded shadow" *@
+                 class="img-thumbnail"
+                 style="max-height: 600px; max-width: 100%; height: auto; width: auto;"
+                 alt="Capa do Livro" />
+        </div>
     </div>
 </div>
 
@@ -137,12 +178,12 @@
         let contador = `@Model.PrecosDeVenda.Count`;
 
         const tipoOptions = `@Html.Raw(string.Join("",
-                            Enum.GetValues(typeof(Biblioteca.WebApp.Model.TipoDeVenda))
-                                                            .Cast<Biblioteca.WebApp.Model.TipoDeVenda>()
-                                                            .Select(e => $"<option value='{(int)e}'>{e}</option>")))`;
+                                                    Enum.GetValues(typeof(Biblioteca.WebApp.Model.TipoDeVenda))
+                                                                                                                    .Cast<Biblioteca.WebApp.Model.TipoDeVenda>()
+                                                                                                                    .Select(e => $"<option value='{(int)e}'>{e}</option>")))`;
 
-        function adicionarLinha() {
-            const tbody = document.querySelector('table tbody');
+    function adicionarLinha() {
+        const tbody = document.querySelector('table tbody');
 
             const novaLinha = document.createElement('tr');
             novaLinha.innerHTML = `

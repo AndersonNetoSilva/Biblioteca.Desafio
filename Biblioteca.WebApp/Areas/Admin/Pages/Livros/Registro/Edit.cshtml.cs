@@ -5,6 +5,7 @@ using Biblioteca.WebApp.Infrastructure.Pages;
 using Biblioteca.WebApp.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 namespace Biblioteca.WebApp.Areas.Admin.Pages.General.Livros
 {
@@ -66,6 +67,9 @@ namespace Biblioteca.WebApp.Areas.Admin.Pages.General.Livros
         [BindProperty]
         public List<PrecoDeVendaVM> PrecosDeVenda { get; set; } = new();
 
+        [BindProperty]
+        public ArquivoVM FotoDaCapa { get; set; } = new();
+
         public async Task<IActionResult> OnGetAsync(int? id)
         {
             if (id == null)
@@ -98,6 +102,21 @@ namespace Biblioteca.WebApp.Areas.Admin.Pages.General.Livros
             return Page();
         }
 
+        public async Task<IActionResult> OnGetConteudoDoArquivoDaCapaAsync(int livroId)
+        {
+            var livro = await _repository.Query()
+                .Include(x => x.ArquivoCapa)
+                .FirstOrDefaultAsync(x => x.Id == livroId);
+
+            if (livro?.ArquivoCapa == null)
+                return NotFound();
+
+            return File(
+                livro.ArquivoCapa.Conteudo,
+                livro.ArquivoCapa.ContentType
+            );
+        }
+
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
@@ -110,7 +129,7 @@ namespace Biblioteca.WebApp.Areas.Admin.Pages.General.Livros
 
             try
             {
-                await _livroService.UpdateAsync(Livro, AutorIds, AssuntoIds, PrecosDeVenda);
+                await _livroService.UpdateAsync(Livro, AutorIds, AssuntoIds, PrecosDeVenda, FotoDaCapa);
             }
             catch (KeyNotFoundException)
             {

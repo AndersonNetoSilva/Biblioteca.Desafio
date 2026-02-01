@@ -5,6 +5,8 @@ using Biblioteca.WebApp.Infrastructure.Pages;
 using Biblioteca.WebApp.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using NuGet.Protocol.Core.Types;
 
 namespace Biblioteca.WebApp.Areas.Admin.Pages.General.Livros
 {
@@ -34,6 +36,21 @@ namespace Biblioteca.WebApp.Areas.Admin.Pages.General.Livros
             BindSelectLists();
 
             return Page();
+        }
+
+        public async Task<IActionResult> OnGetConteudoDoArquivoDaCapaAsync(int livroId)
+        {
+            var livro = await _repository.Query()
+                .Include(x => x.ArquivoCapa)
+                .FirstOrDefaultAsync(x => x.Id == livroId);
+
+            if (livro?.ArquivoCapa == null)
+                return NotFound();
+
+            return File(
+                livro.ArquivoCapa.Conteudo,
+                livro.ArquivoCapa.ContentType
+            );
         }
 
         #region SelectLists
@@ -68,6 +85,9 @@ namespace Biblioteca.WebApp.Areas.Admin.Pages.General.Livros
         [BindProperty]
         public List<PrecoDeVendaVM> PrecosDeVenda { get; set; } = new();
 
+        [BindProperty]
+        public ArquivoVM FotoDaCapa { get; set; } = new();
+
         // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
         {
@@ -79,7 +99,7 @@ namespace Biblioteca.WebApp.Areas.Admin.Pages.General.Livros
 
             try
             {
-                await _livroService.AddAsync(Livro, AutorIds, AssuntoIds, PrecosDeVenda);
+                await _livroService.AddAsync(Livro, AutorIds, AssuntoIds, PrecosDeVenda, FotoDaCapa);
             }
             catch (KeyNotFoundException)
             {

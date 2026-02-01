@@ -21,6 +21,8 @@ namespace Biblioteca.WebApp.Data
 
         public DbSet<PrecoDeVenda> PrecosDeVenda { get; set; }
 
+        public DbSet<Arquivo> Arquivos { get; set; }
+
         public DbSet<ReportLivrosView> ReportLivrosViewSet => Set<ReportLivrosView>();
 
         protected override void OnModelCreating(ModelBuilder builder)

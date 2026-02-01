@@ -27,7 +27,14 @@ namespace Biblioteca.WebApp.Model
         [Required(ErrorMessage = "O valor é obrigatório")]
         [Display(Name = "Valor")]
         [NotMapped]
-        public string ValorString { get; set; }        
+        public string ValorString { get; set; }
+
+        [ForeignKey(nameof(ArquivoCapa))]
+        [Display(Name = "Foto da Capa")]
+        public int? ArquivoCapaId { get; set; }
+
+        [Display(Name = "Foto da Capa")]
+        public Arquivo? ArquivoCapa { get; set; }
 
         public List<Autor> Autores { get; set; } = new();
         

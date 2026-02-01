@@ -9,7 +9,7 @@
 
 <div class="row">
     <div class="col-md-12">
-        <form method="post">
+        <form method="post" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div class="row">
@@ -68,6 +68,27 @@
                         <select asp-for="AssuntoIds" asp-items="Model.Assuntos" multiple class="form-control"></select>
                     </div>
                 </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb3">
+                    <label asp-for="FotoDaCapa.Arquivo" class="form-label"></label>
+                    <input asp-for="FotoDaCapa.Arquivo"
+                           type="file"
+                           class="form-control"
+                           accept="image/*" />
+                    <span asp-validation-for="FotoDaCapa.Arquivo" class="text-danger"></span>
+                </div>
+
+                @if (Model.FotoDaCapa != null)
+                {
+                    <div class="col-md-4 d-flex flex-column">
+                        <label class="form-label">Conteúdo do Arquivo</label>
+                        <img src="@Url.Page(null, "ConteudoDoArquivoDaCapa", new { livroId = Model.Livro.Id })"
+                             class="img-thumbnail img-fluid align-self-start mt-2"
+                             style="max-height: 150px; width: auto;" />
+                    </div>
+                }
             </div>
 
             <div class="row">
@@ -133,54 +154,54 @@
 
 
     <script>
-        let contador = `@Model.PrecosDeVenda.Count`;
+            let contador = `@Model.PrecosDeVenda.Count`;
 
-        const tipoOptions = `@Html.Raw(string.Join("",
-                                                    Enum.GetValues(typeof(Biblioteca.WebApp.Model.TipoDeVenda))
-                                                                                                                    .Cast<Biblioteca.WebApp.Model.TipoDeVenda>()
-                                                                                                                    .Select(e => $"<option value='{(int)e}'>{e}</option>")))`;
+            const tipoOptions = `@Html.Raw(string.Join("",
+                                                                                                            Enum.GetValues(typeof(Biblioteca.WebApp.Model.TipoDeVenda))
+                                                                                                                                                                                                                                            .Cast<Biblioteca.WebApp.Model.TipoDeVenda>()
+                                                                                                                                                                                                                                            .Select(e => $"<option value='{(int)e}'>{e}</option>")))`;
 
     function adicionarLinha() {
         const tbody = document.querySelector('table tbody');
 
-            const novaLinha = document.createElement('tr');
-            novaLinha.innerHTML = `
-                <td>
-                    <button type="button" class="btn btn-outline-danger btn-sm p-1"
-                            onclick="this.closest('tr').remove()">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                <input type="hidden" name="PrecosDeVenda[${contador}].Id" value="0" />
-                </td>
-                <td>
-                <select name="PrecosDeVenda[${contador}].Tipo" class="form-select">
-                        ${tipoOptions}
-                    </select>
-                </td>
-                <td>
-                    <input name="PrecosDeVenda[${contador}].ValorString" class="form-control" asp-format="{0:C}"/>
-                    <span asp-validation-for="PrecosDeVenda[${contador}].ValorString" class="text-danger"></span>
-                </td>
-            `;
+                const novaLinha = document.createElement('tr');
+                novaLinha.innerHTML = `
+                    <td>
+                        <button type="button" class="btn btn-outline-danger btn-sm p-1"
+                                onclick="this.closest('tr').remove()">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    <input type="hidden" name="PrecosDeVenda[${contador}].Id" value="0" />
+                    </td>
+                    <td>
+                    <select name="PrecosDeVenda[${contador}].Tipo" class="form-select">
+                            ${tipoOptions}
+                        </select>
+                    </td>
+                    <td>
+                        <input name="PrecosDeVenda[${contador}].ValorString" class="form-control" asp-format="{0:C}"/>
+                        <span asp-validation-for="PrecosDeVenda[${contador}].ValorString" class="text-danger"></span>
+                    </td>
+                `;
 
-            tbody.appendChild(novaLinha);
-            contador++;
-        };
+                tbody.appendChild(novaLinha);
+                contador++;
+            };
 
-        function marcarParaExclusao(button, arrayName) {
-            const row = button.closest('tr');
+            function marcarParaExclusao(button, arrayName) {
+                const row = button.closest('tr');
 
-            const hidden = row.querySelector(
-                `input[type="hidden"][name^="${arrayName}["][name$=".MarcadoParaExclusao"]`
-            );
+                const hidden = row.querySelector(
+                    `input[type="hidden"][name^="${arrayName}["][name$=".MarcadoParaExclusao"]`
+                );
 
-            if (!hidden) return;
+                if (!hidden) return;
 
-            hidden.value = "true";
+                hidden.value = "true";
 
-            row.classList.add('table-danger', 'text-muted');
+                row.classList.add('table-danger', 'text-muted');
 
-            button.disabled = true;
-        };
+                button.disabled = true;
+            };
     </script>
 }
