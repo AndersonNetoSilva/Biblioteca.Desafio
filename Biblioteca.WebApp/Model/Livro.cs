@@ -29,12 +29,19 @@ namespace Biblioteca.WebApp.Model
         [NotMapped]
         public string ValorString { get; set; }
 
-        [ForeignKey(nameof(ArquivoCapa))]
-        [Display(Name = "Foto da Capa")]
-        public int? ArquivoCapaId { get; set; }
+        [ForeignKey(nameof(ArquivoImagem))]
+        [Display(Name = "Imagem")]
+        public int? ArquivoImagemId { get; set; }
 
-        [Display(Name = "Foto da Capa")]
-        public Arquivo? ArquivoCapa { get; set; }
+        [Display(Name = "Imagem")]
+        public Arquivo? ArquivoImagem { get; set; }
+
+        [ForeignKey(nameof(ArquivoDownload))]
+        [Display(Name = "Arquivo Download")]
+        public int? ArquivoDownloadId { get; set; }
+
+        [Display(Name = "Arquivo Download")]
+        public Arquivo? ArquivoDownload { get; set; }
 
         public List<Autor> Autores { get; set; } = new();
         

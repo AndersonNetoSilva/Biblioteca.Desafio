@@ -72,23 +72,22 @@
 
             <div class="row">
                 <div class="col-md-6 mb3">
-                    <label asp-for="FotoDaCapa.Arquivo" class="form-label"></label>
-                    <input asp-for="FotoDaCapa.Arquivo"
+                    <label class="form-label">Imagem</label>
+                    <input asp-for="ArquivoImagem.FormFile"
                            type="file"
                            class="form-control"
                            accept="image/*" />
-                    <span asp-validation-for="FotoDaCapa.Arquivo" class="text-danger"></span>
+                    <span asp-validation-for="ArquivoImagem.FormFile" class="text-danger"></span>
                 </div>
 
-                @if (Model.FotoDaCapa != null)
-                {
-                    <div class="col-md-4 d-flex flex-column">
-                        <label class="form-label">Conteúdo do Arquivo</label>
-                        <img src="@Url.Page(null, "ConteudoDoArquivoDaCapa", new { livroId = Model.Livro.Id })"
-                             class="img-thumbnail img-fluid align-self-start mt-2"
-                             style="max-height: 150px; width: auto;" />
-                    </div>
-                }
+                <div class="col-md-6 mb3">
+                    <label class="form-label">Documento</label>
+                    <input asp-for="ArquivoDownload.FormFile"
+                           type="file"
+                           class="form-control"
+                           accept=".pdf,.doc,.docx,.txt,.rtf,.odt,.zip,.rar" />
+                    <span asp-validation-for="ArquivoDownload.FormFile" class="text-danger"></span>
+                </div>
             </div>
 
             <div class="row">

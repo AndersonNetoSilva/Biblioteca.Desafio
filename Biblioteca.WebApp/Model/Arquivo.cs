@@ -13,14 +13,10 @@ namespace Biblioteca.WebApp.Model
         public DateTime? DataUltimaAlteracao { get; set; } = null;
     }
 
-    public class ArquivoVM : IPermiteMarcarParaExclusao
+    public class ArquivoVM 
     {
         public int Id { get; set; }
         public string? Descricao { get; set; } = null;
-
-        [Display(Name = "Arquivo")]
-        public IFormFile? Arquivo { get; set; }
-        public int? ArquivoId { get; set; }
-        public bool MarcadoParaExclusao { get; set; } = false;
+        public IFormFile? FormFile { get; set; }
     }
 }

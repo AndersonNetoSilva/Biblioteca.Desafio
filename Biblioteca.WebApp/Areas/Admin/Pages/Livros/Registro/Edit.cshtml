@@ -72,23 +72,48 @@
 
             <div class="row">
                 <div class="col-md-6 mb3">
-                    <label asp-for="FotoDaCapa.Arquivo" class="form-label"></label>
-                    <input asp-for="FotoDaCapa.Arquivo"
+                    <label class="form-label">Imagem</label>
+                    <input asp-for="ArquivoImagem.FormFile"
                            type="file"
                            class="form-control"
                            accept="image/*" />
-                    <span asp-validation-for="FotoDaCapa.Arquivo" class="text-danger"></span>
+                    <span asp-validation-for="ArquivoImagem.FormFile" class="text-danger"></span>
                 </div>
 
-                @if (Model.FotoDaCapa != null)
+                @if (Model.Livro.ArquivoImagemId > 0)
                 {
                     <div class="col-md-4 d-flex flex-column">
-                        <label class="form-label">Conteúdo do Arquivo</label>
-                        <img src="@Url.Page(null, "ConteudoDoArquivoDaCapa", new { livroId = Model.Livro.Id })"
+                        <label class="form-label">Visualização Imagem</label>
+                        <img src="@Url.Page(null, "ConteudoDoArquivo", new { livroId = Model.Livro.Id })"
                              class="img-thumbnail img-fluid align-self-start mt-2"
                              style="max-height: 150px; width: auto; cursor: zoom-in;"
                              data-bs-toggle="modal"
                              data-bs-target="#modalImagemCapa" />
+                    </div>
+                }
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb3">
+                    <label class="form-label">Documento</label>
+                    <input asp-for="ArquivoDownload.FormFile"
+                           type="file"
+                           class="form-control"
+                           accept=".pdf,.doc,.docx,.txt,.rtf,.odt,.zip,.rar" />
+                    <span asp-validation-for="ArquivoDownload.FormFile" class="text-danger"></span>
+                </div>
+
+                @if (Model.Livro.ArquivoDownloadId > 0)
+                {
+                    <div class="col-md-4 d-flex flex-column">
+                        <label class="form-label">Download do Documento</label>
+                        <div class="d-flex align-items-center gap-2 mt-2">                            
+                            <a class="btn btn-sm btn-outline-primary"
+                               href="@Url.Page(null, "DownloadDoArquivo", new { livroId = Model.Livro.Id })">
+                                <i class="bi bi-download"></i>
+                                Download
+                            </a>
+                        </div>
                     </div>
                 }
             </div>
@@ -141,7 +166,8 @@
             </div>
 
             <input type="hidden" asp-for="Livro.Id" />
-            <input type="hidden" asp-for="Livro.ArquivoCapaId" />
+            <input type="hidden" asp-for="Livro.ArquivoImagemId" />
+            <input type="hidden" asp-for="Livro.ArquivoDownloadId" />
 
             <div class="form-group mt-3 d-flex justify-content-between">
                 <input type="submit" value="Gravar" class="btn btn-primary" />
@@ -160,8 +186,7 @@
                     data-bs-dismiss="modal"
                     aria-label="Close"></button>
 
-            <img src="@Url.Page(null, "ConteudoDoArquivoDaCapa", new { livroId = Model.Livro.Id })"
-                 @* class="img-fluid rounded shadow" *@
+            <img src="@Url.Page(null, "ConteudoDoArquivo", new { livroId = Model.Livro.Id })"
                  class="img-thumbnail"
                  style="max-height: 600px; max-width: 100%; height: auto; width: auto;"
                  alt="Capa do Livro" />

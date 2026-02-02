@@ -68,7 +68,10 @@ namespace Biblioteca.WebApp.Areas.Admin.Pages.General.Livros
         public List<PrecoDeVendaVM> PrecosDeVenda { get; set; } = new();
 
         [BindProperty]
-        public ArquivoVM FotoDaCapa { get; set; } = new();
+        public ArquivoVM ArquivoImagem { get; set; } = new();
+
+        [BindProperty]
+        public ArquivoVM ArquivoDownload { get; set; } = new();
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -102,18 +105,34 @@ namespace Biblioteca.WebApp.Areas.Admin.Pages.General.Livros
             return Page();
         }
 
-        public async Task<IActionResult> OnGetConteudoDoArquivoDaCapaAsync(int livroId)
+        public async Task<IActionResult> OnGetConteudoDoArquivoAsync(int livroId)
         {
             var livro = await _repository.Query()
-                .Include(x => x.ArquivoCapa)
+                .Include(x => x.ArquivoImagem)
                 .FirstOrDefaultAsync(x => x.Id == livroId);
 
-            if (livro?.ArquivoCapa == null)
+            if (livro?.ArquivoImagem == null)
                 return NotFound();
 
             return File(
-                livro.ArquivoCapa.Conteudo,
-                livro.ArquivoCapa.ContentType
+                livro.ArquivoImagem.Conteudo,
+                livro.ArquivoImagem.ContentType
+            );
+        }
+
+        public async Task<IActionResult> OnGetDownloadDoArquivoAsync(int livroId)
+        {
+            var livro = await _repository.Query()
+                .Include(x => x.ArquivoDownload)
+                .FirstOrDefaultAsync(x => x.Id == livroId);
+
+            if (livro?.ArquivoDownload == null)
+                return NotFound();
+
+            return File(
+                livro.ArquivoDownload.Conteudo,
+                livro.ArquivoDownload.ContentType,
+                livro.ArquivoDownload.NomeOriginal
             );
         }
 
@@ -129,7 +148,7 @@ namespace Biblioteca.WebApp.Areas.Admin.Pages.General.Livros
 
             try
             {
-                await _livroService.UpdateAsync(Livro, AutorIds, AssuntoIds, PrecosDeVenda, FotoDaCapa);
+                await _livroService.UpdateAsync(Livro, AutorIds, AssuntoIds, PrecosDeVenda, ArquivoImagem, ArquivoDownload);
             }
             catch (KeyNotFoundException)
             {
