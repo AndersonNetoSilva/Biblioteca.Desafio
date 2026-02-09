@@ -1,14 +1,14 @@
 ﻿using Biblioteca.WebApp.Model;
 using Biblioteca.WebApp.Model.Views;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection.Emit;
 
 namespace Biblioteca.WebApp.Data
 {
-    public class ApplicationDbContext: DbContext
+    public class ApplicationDbContext : IdentityDbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-            :base(options) 
+            : base(options)
         {
 
         }
@@ -52,6 +52,12 @@ namespace Biblioteca.WebApp.Data
                 .HasOne(p => p.Livro)
                 .WithMany(l => l.PrecosDeVenda)
                 .HasForeignKey(p => p.LivroId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Livro>()
+                .HasOne(l => l.ArquivoImagem)
+                .WithMany()
+                .HasForeignKey(l => l.ArquivoImagemId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

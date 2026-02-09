@@ -1,5 +1,6 @@
 using Biblioteca.WebApp.Data;
 using Biblioteca.WebApp.Infrastructure.Extensions;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Biblioteca.WebApp
@@ -17,6 +18,14 @@ namespace Biblioteca.WebApp
                 options.UseSqlServer(connectionString));
 
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+            builder.Services.AddDefaultIdentity<IdentityUser>(options =>
+            {
+                options.SignIn.RequireConfirmedAccount = true;
+                options.Tokens.AuthenticatorTokenProvider = TokenOptions.DefaultAuthenticatorProvider;
+            })
+                .AddRoles<IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>();
 
             builder.Services.AddRazorPages();
 
@@ -42,9 +51,13 @@ namespace Biblioteca.WebApp
 
             app.UseRouting();
 
+            app.UseAuthorization();
+
             app.MapRazorPages();
 
             DbInitializer.SeddAsync(app.Services).Wait();
+
+            DbInitializer.SeedRolesAndAdminAsync(app.Services).Wait();
 
             app.Run();
         }
