@@ -48,5 +48,8 @@ namespace Biblioteca.WebApp.Model
         public List<Assunto> Assuntos { get; set; } = new();
 
         public List<PrecoDeVenda> PrecosDeVenda { get; set; } = new();
+
+        public List<AnexoDoLivro> Anexos { get; set; } = new();
+        
     }
 }

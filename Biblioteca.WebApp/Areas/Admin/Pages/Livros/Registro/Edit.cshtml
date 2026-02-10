@@ -165,6 +165,69 @@
                 </div>
             </div>
 
+            <div class="row">
+                <div class="col-md-12">
+                    <h5 class="mt-4">Anexos</h5>
+
+                    <table id="tabelaAnexos" class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <button type="button" class="btn btn-outline-primary btn-sm p-1"
+                                            onclick="adicionarAnexo()">
+                                        <i class="bi bi-plus-circle"></i>
+                                    </button>
+                                </th>
+                                <th>Descrição</th>
+                                <th>Tipo</th>
+                                <th>Arquivo</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.AnexosDoLivro.Count; i++)
+                            {
+                                <tr data-index="@i">
+                                    <td>
+                                        <button type="button" class="btn btn-outline-danger btn-sm p-1"
+                                                onclick="marcarParaExclusao(this, 'AnexosDoLivro');">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+
+                                        <input type="hidden" asp-for="AnexosDoLivro[@i].Id" />
+                                        <input type="hidden" asp-for="AnexosDoLivro[@i].MarcadoParaExclusao" />
+                                    </td>
+                                    <td>
+                                        <input asp-for="AnexosDoLivro[@i].Descricao" class="form-control" />
+                                        <span asp-validation-for="AnexosDoLivro[@i].Descricao" class="text-danger"></span>
+                                    </td>
+                                    <td>
+                                        @Model.AnexosDoLivro[i].Tipo
+                                    </td>
+                                    <td>
+                                        <input asp-for="AnexosDoLivro[@i].FormFile"
+                                               type="file"
+                                               class="form-control"
+                                               accept="*" />
+                                        <span asp-validation-for="AnexosDoLivro[@i].FormFile" class="text-danger"></span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2 mt-2">
+                                            <a class="btn btn-sm btn-outline-primary"
+                                               href="@Url.Page(null, "DownloadDoAnexoDoLivro", new { livroId = Model.Livro.Id, anexoId = Model.AnexosDoLivro[i].Id })">
+                                                <i class="bi bi-download"></i>
+                                                Download
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
             <input type="hidden" asp-for="Livro.Id" />
             <input type="hidden" asp-for="Livro.ArquivoImagemId" />
             <input type="hidden" asp-for="Livro.ArquivoDownloadId" />
@@ -201,6 +264,7 @@
 
     <script>
         let contador = `@Model.PrecosDeVenda.Count`;
+            let contadorAnexo = `@Model.AnexosDoLivro.Count`;
 
         const tipoOptions = `@Html.Raw(string.Join("",
                                                     Enum.GetValues(typeof(Biblioteca.WebApp.Model.TipoDeVenda))
@@ -233,6 +297,38 @@
             tbody.appendChild(novaLinha);
             contador++;
         };
+
+        function adicionarAnexo() {
+                        const tbody = document.querySelector('#tabelaAnexos tbody');
+
+                        const novaLinha = document.createElement('tr');
+                        novaLinha.innerHTML = `
+                            <td>
+                                <button type="button" class="btn btn-outline-danger btn-sm p-1"
+                                        onclick="marcarParaExclusao(this, 'AnexosDoLivro');">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+
+                                    <input type="hidden" name="AnexosDoLivro[${contadorAnexo}].Id" value="0"/>
+                                    <input type="hidden" name="AnexosDoLivro[${contadorAnexo}].MarcadoParaExclusao" value="false"/>
+                            </td>
+                            <td>
+                                    <input name="AnexosDoLivro[${contadorAnexo}].Descricao" class="form-control" />
+                                    <span class="text-danger field-validation-valid"
+                                                       data-valmsg-for="AnexosDoLivro[${contadorAnexo}].Descricao"
+                                           data-valmsg-replace="true"></span>
+                            </td>
+                            <td>
+                                    <input name="AnexosDoLivro[${contadorAnexo}].FormFile"
+                                       type="file"
+                                       class="form-control"
+                                       accept="*" />
+                            </td>
+                        `;
+
+                        tbody.appendChild(novaLinha);
+                        contadorAnexo++;
+                    }
 
         function marcarParaExclusao(button, arrayName) {
             const row = button.closest('tr');

@@ -2,12 +2,10 @@
 using Biblioteca.WebApp.Infrastructure.Abstractions.Services;
 using Biblioteca.WebApp.Infrastructure.Exceptions;
 using Biblioteca.WebApp.Infrastructure.Pages;
-using Biblioteca.WebApp.Infrastructure.Repositories;
 using Biblioteca.WebApp.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using NuGet.Protocol.Core.Types;
 
 namespace Biblioteca.WebApp.Areas.Admin.Pages.General.Livros
 {
@@ -103,6 +101,9 @@ namespace Biblioteca.WebApp.Areas.Admin.Pages.General.Livros
         public List<PrecoDeVendaVM> PrecosDeVenda { get; set; } = new();
 
         [BindProperty]
+        public List<AnexoDoLivroVM> AnexosDoLivro { get; set; } = new();
+
+        [BindProperty]
         public ArquivoVM ArquivoImagem { get; set; } = new();
 
         [BindProperty]
@@ -119,7 +120,7 @@ namespace Biblioteca.WebApp.Areas.Admin.Pages.General.Livros
 
             try
             {
-                await _livroService.AddAsync(Livro, AutorIds, AssuntoIds, PrecosDeVenda, ArquivoImagem, ArquivoDownload);
+                await _livroService.AddAsync(Livro, AutorIds, AssuntoIds, PrecosDeVenda, ArquivoImagem, ArquivoDownload, AnexosDoLivro);
             }
             catch (KeyNotFoundException)
             {

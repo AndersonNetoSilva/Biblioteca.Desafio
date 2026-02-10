@@ -21,6 +21,8 @@ namespace Biblioteca.WebApp.Data
 
         public DbSet<PrecoDeVenda> PrecosDeVenda { get; set; }
 
+        public DbSet<AnexoDoLivro> AnexosDoLivro { get; set; }
+
         public DbSet<Arquivo> Arquivos { get; set; }
 
         public DbSet<ReportLivrosView> ReportLivrosViewSet => Set<ReportLivrosView>();
@@ -58,6 +60,18 @@ namespace Biblioteca.WebApp.Data
                 .HasOne(l => l.ArquivoImagem)
                 .WithMany()
                 .HasForeignKey(l => l.ArquivoImagemId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<AnexoDoLivro>()
+                .HasOne(p => p.Livro)
+                .WithMany(l => l.Anexos)
+                .HasForeignKey(p => p.LivroId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<AnexoDoLivro>()
+                .HasOne(l => l.Anexo)
+                .WithMany()
+                .HasForeignKey(l => l.AnexoId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

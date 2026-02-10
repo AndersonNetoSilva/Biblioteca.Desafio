@@ -33,7 +33,8 @@ namespace Biblioteca.WebApp.Infrastructure.Services
             Livro livro,
             IEnumerable<int> autorIds,
             IEnumerable<int> assuntoIds,
-            IEnumerable<PrecoDeVendaVM> precosDeVenda, ArquivoVM? arquivoImagem, ArquivoVM? arquivoDownload)
+            IEnumerable<PrecoDeVendaVM> precosDeVenda, ArquivoVM? arquivoImagem, ArquivoVM? arquivoDownload,
+            IEnumerable<AnexoDoLivroVM> anexosDoLivro)
         {
             ValidarValor(livro);
 
@@ -55,7 +56,9 @@ namespace Biblioteca.WebApp.Infrastructure.Services
 
             await SyncAutoresAsync(livro, autorIds);
             await SyncAssuntosAsync(livro, assuntoIds);
-            SyncPrecos(livro, precosDeVenda);
+            await SyncAnexosAsync(livro, anexosDoLivro);
+
+            SyncPrecos(livro, precosDeVenda);           
 
             await _unitOfWork.CommitAsync();
         }
@@ -65,8 +68,8 @@ namespace Biblioteca.WebApp.Infrastructure.Services
             ArquivoVM arquivoVm,
             Func<Livro, Arquivo?> getter,
             Action<Livro, Arquivo> setter)
-        {
-            if (arquivoVm?.FormFile == null)
+        {            
+            if (arquivoVm?.FormFile == null || arquivoVm?.FormFile?.Length <= 0)
                 return;
 
             using var ms = new MemoryStream();
@@ -100,7 +103,8 @@ namespace Biblioteca.WebApp.Infrastructure.Services
         }
 
         public async Task UpdateAsync(Livro Livro, IEnumerable<int> autorIds, IEnumerable<int> assuntoIds,
-            IEnumerable<PrecoDeVendaVM> precosDeVenda, ArquivoVM? arquivoImagem, ArquivoVM? arquivoDownload)
+            IEnumerable<PrecoDeVendaVM> precosDeVenda, ArquivoVM? arquivoImagem, ArquivoVM? arquivoDownload,
+            IEnumerable<AnexoDoLivroVM> anexosDoLivro)
         {
             var livro = await _livroRepository.GetForUpdateAsync(Livro.Id);
 
@@ -126,8 +130,9 @@ namespace Biblioteca.WebApp.Infrastructure.Services
 
                 await SyncAutoresAsync(livro, autorIds);
                 await SyncAssuntosAsync(livro, assuntoIds);
+                await SyncAnexosAsync(livro, anexosDoLivro);
 
-                SyncPrecos(livro, precosDeVenda);
+                SyncPrecos(livro, precosDeVenda);                
 
                 try
                 {
@@ -145,6 +150,98 @@ namespace Biblioteca.WebApp.Infrastructure.Services
                     }
                 }
             }
+        }
+
+        private async Task SyncAnexosAsync(Livro livro, IEnumerable<AnexoDoLivroVM> anexoDoLivroVMList)
+        {
+            var idsParaExclusao = anexoDoLivroVMList
+                        .Where(x => x.Id.HasValue && x.MarcadoParaExclusao)
+                        .Select(x => x.Id.Value)
+                        .ToHashSet();
+
+            livro.Anexos.RemoveAll(p => idsParaExclusao.Contains(p.Id));
+
+            var indice = 0;
+
+            foreach (var anexoDoLivroVM in anexoDoLivroVMList)
+            {
+                if (!anexoDoLivroVM.MarcadoParaExclusao)
+                {
+                    if (anexoDoLivroVM.Id.HasValue && anexoDoLivroVM.Id.Value > 0)
+                    {
+                        var anexoDoLivro = livro.Anexos.First(p => p.Id == anexoDoLivroVM.Id);
+
+                        await SalvarOuSubstituirAnexoAsync(livro, anexoDoLivro, anexoDoLivroVM);
+                    }
+                    else
+                    {
+                        var anexo = await SalvarOuSubstituirAnexoAsync(livro, null, anexoDoLivroVM);
+
+                        if (anexo != null)
+                        livro.Anexos.Add(anexo);
+                    }
+                }
+
+                indice++;
+            }
+
+        }
+
+        private async Task<AnexoDoLivro> SalvarOuSubstituirAnexoAsync(Livro livro, AnexoDoLivro anexoDoLivro, AnexoDoLivroVM anexoDoLivroMV)
+        {
+            if (anexoDoLivroMV?.FormFile == null || anexoDoLivroMV?.FormFile?.Length <= 0)
+                return anexoDoLivro;
+
+            using var ms = new MemoryStream();
+
+            await anexoDoLivroMV.FormFile.CopyToAsync(ms);            
+
+            if (anexoDoLivro?.Anexo != null)
+            {
+                anexoDoLivro.Anexo.Conteudo = ms.ToArray();
+                anexoDoLivro.Anexo.ContentType = anexoDoLivroMV.FormFile.ContentType;
+                anexoDoLivro.Anexo.Tamanho = (int)anexoDoLivroMV.FormFile.Length;
+                anexoDoLivro.Anexo.NomeOriginal = anexoDoLivroMV.FormFile.FileName;
+                anexoDoLivro.Anexo.Descricao = anexoDoLivroMV.Descricao ?? anexoDoLivroMV.FormFile.FileName;
+                anexoDoLivro.Anexo.DataUltimaAlteracao = DateTime.UtcNow;
+                anexoDoLivro.Descricao = anexoDoLivroMV.Descricao ?? anexoDoLivroMV.FormFile.FileName;
+                anexoDoLivro.Tipo = IsImageFileName(anexoDoLivro.Anexo.NomeOriginal) ? TipoANexo.Imagem : TipoANexo.Arquivo;
+            }
+            else
+            {
+                var anexo = new Arquivo
+                {
+                    Conteudo = ms.ToArray(),
+                    ContentType = anexoDoLivroMV.FormFile.ContentType,
+                    Tamanho = (int)anexoDoLivroMV.FormFile.Length,
+                    NomeOriginal = anexoDoLivroMV.FormFile.FileName,
+                    Descricao = anexoDoLivroMV.Descricao ?? anexoDoLivroMV.FormFile.FileName,
+                    DataCriacao = DateTime.UtcNow
+                };
+
+                anexoDoLivro = new AnexoDoLivro
+                {
+                    Anexo = anexo,
+                    Descricao = anexoDoLivroMV.Descricao ?? anexoDoLivroMV.FormFile.FileName,
+                    Tipo = IsImageFileName(anexo.NomeOriginal) ? TipoANexo.Imagem : TipoANexo.Arquivo
+                };
+
+                livro.Anexos.Add(anexoDoLivro);
+            }
+
+            return anexoDoLivro;
+        }
+
+        private bool IsImageFileName(string nomeOriginal)
+        {
+            if (string.IsNullOrWhiteSpace(nomeOriginal))
+                return false;
+
+            string extension = Path.GetExtension(nomeOriginal).ToLowerInvariant();
+
+            string[] imageExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".webp" };
+
+            return Array.Exists(imageExtensions, ext => ext == extension);
         }
 
         private static void ValidarValor(Livro Livro)

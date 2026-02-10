@@ -68,6 +68,9 @@ namespace Biblioteca.WebApp.Areas.Admin.Pages.General.Livros
         public List<PrecoDeVendaVM> PrecosDeVenda { get; set; } = new();
 
         [BindProperty]
+        public List<AnexoDoLivroVM> AnexosDoLivro { get; set; } = new();
+
+        [BindProperty]
         public ArquivoVM ArquivoImagem { get; set; } = new();
 
         [BindProperty]
@@ -97,6 +100,16 @@ namespace Biblioteca.WebApp.Areas.Admin.Pages.General.Livros
                     ValorString = p.Valor.ToString("N2")
                 })
                 .ToList();
+
+            AnexosDoLivro = livro.Anexos
+            .Select(a => new AnexoDoLivroVM
+            {
+                Id = a.Id,
+                Descricao = a.Descricao,
+                MarcadoParaExclusao = false,
+                Tipo = a.Tipo.ToString()
+            })
+            .ToList();
 
             Livro = livro;
 
@@ -136,6 +149,28 @@ namespace Biblioteca.WebApp.Areas.Admin.Pages.General.Livros
             );
         }
 
+        public async Task<IActionResult> OnGetDownloadDoAnexoDoLivroAsync(int livroId, int anexoId)
+        {
+            var livro = await _repository.Query()
+                    .Include(x => x.Anexos)
+                    .ThenInclude(x => x.Anexo)
+                .FirstOrDefaultAsync(x => x.Id == livroId && x.Anexos.Any(a => a.Id == anexoId));
+
+            if (livro == null)
+                return NotFound();
+
+            var anexoDoLivro = livro.Anexos.FirstOrDefault(x => x.Id == anexoId);
+
+            if (anexoDoLivro?.Anexo == null)
+                return NotFound();
+
+            return File(
+                anexoDoLivro.Anexo.Conteudo,
+                anexoDoLivro.Anexo.ContentType,
+                anexoDoLivro.Anexo.NomeOriginal
+            );
+        }
+
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
@@ -148,7 +183,7 @@ namespace Biblioteca.WebApp.Areas.Admin.Pages.General.Livros
 
             try
             {
-                await _livroService.UpdateAsync(Livro, AutorIds, AssuntoIds, PrecosDeVenda, ArquivoImagem, ArquivoDownload);
+                await _livroService.UpdateAsync(Livro, AutorIds, AssuntoIds, PrecosDeVenda, ArquivoImagem, ArquivoDownload, AnexosDoLivro);
             }
             catch (KeyNotFoundException)
             {

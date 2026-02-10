@@ -22,6 +22,8 @@ namespace Biblioteca.WebApp.Infrastructure.Repositories
                 .Include(x => x.PrecosDeVenda)
                 .Include(x => x.ArquivoImagem)
                 .Include(x => x.ArquivoDownload)
+                .Include(x => x.Anexos)
+                    .ThenInclude(a => a.Anexo)
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
     }
