@@ -348,32 +348,75 @@
     function adicionarLinha() {
         const tbody = document.querySelector('table tbody');
 
-                                    const novaLinha = document.createElement('tr');
-                                    novaLinha.innerHTML = `
-                                        <td>
-                                            <button type="button" class="btn btn-outline-danger btn-sm p-1"
-                                                    onclick="this.closest('tr').remove()">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        <input type="hidden" name="PrecosDeVenda[${contador}].Id" value="0" />
-                                        </td>
-                                            <td>
-                                                    </td>
-                                        <td>
-                                            
-                                        <select name="PrecosDeVenda[${contador}].Tipo" class="form-select">
-                                                ${tipoOptions}
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <input name="PrecosDeVenda[${contador}].ValorString" class="form-control" asp-format="{0:C}"/>
-                                            <span asp-validation-for="PrecosDeVenda[${contador}].ValorString" class="text-danger"></span>
-                                        </td>
-                                    `;
+            // Linha de exibição
+            const linhaDisplay = document.createElement('tr');
+            linhaDisplay.classList.add('display-row');
+            linhaDisplay.dataset.index = contador;
+            linhaDisplay.innerHTML = `
+                <td class="text-center text-nowrap" style="width:1%">
+                    <button type="button" class="btn btn-sm btn-outline-secondary btn-sm p-1"
+                            onclick="toggleEditor(this)">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                </td>
+                <td class="text-center text-nowrap" style="width:1%">
+                    <button type="button" class="btn btn-outline-danger btn-sm p-1"
+                            onclick="marcarParaExclusao(this, 'PrecosDeVenda');">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                    <input type="hidden" name="PrecosDeVenda[${contador}].Id" value="0" />
+                    <input type="hidden" name="PrecosDeVenda[${contador}].MarcadoParaExclusao" value="false" />
+                </td>
+                <td class="tipo-text"></td>
+                <td class="valor-text"></td>
+            `;
+            tbody.appendChild(linhaDisplay);
 
-                                    tbody.appendChild(novaLinha);
-                                    contador++;
-                                };
+            // Linha de edição (editor)
+            const linhaEditor = document.createElement('tr');
+            linhaEditor.classList.add('editor-row');
+            linhaEditor.dataset.index = contador;
+            linhaEditor.innerHTML = `
+                <td colspan="4" class="p-0">
+                    <div class="bg-body-secondary border-start border-4 border-primary rounded-3 p-3">
+                        <div class="row mt-2">
+                            <div class="col-md-4">
+                                <label class="control-label">Tipo</label>
+                                <select name="PrecosDeVenda[${contador}].Tipo" class="form-select">
+                                    ${tipoOptions}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-4">
+                                <label class="control-label">Valor</label>
+                                <input name="PrecosDeVenda[${contador}].ValorString" class="form-control" />
+                                <span class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-12 d-flex justify-content-end gap-2">
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-secondary"
+                                        style="width: 48px; height: 40px;"
+                                        onclick="confirmarEdicao(this)">
+                                    <i class="bi bi-check-lg"></i>
+                                </button>
+                                <button type="button"
+                                        class="btn btn-outline-danger btn-sm p-1"
+                                        style="width: 48px; height: 40px;"
+                                        onclick="fecharEditor(this)">
+                                    <i class="bi bi-door-open"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(linhaEditor);
+
+            contador++;
+        }
 
                                 function adicionarAnexo() {
                                                 const tbody = document.querySelector('#tabelaAnexos tbody');
