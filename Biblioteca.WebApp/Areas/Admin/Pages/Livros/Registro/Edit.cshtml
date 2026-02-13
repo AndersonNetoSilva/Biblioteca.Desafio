@@ -107,7 +107,7 @@
                 {
                     <div class="col-md-4 d-flex flex-column">
                         <label class="form-label">Download do Documento</label>
-                        <div class="d-flex align-items-center gap-2 mt-2">                            
+                        <div class="d-flex align-items-center gap-2 mt-2">
                             <a class="btn btn-sm btn-outline-primary"
                                href="@Url.Page(null, "DownloadDoArquivo", new { livroId = Model.Livro.Id })">
                                 <i class="bi bi-download"></i>
@@ -135,7 +135,10 @@
                                 <th>Valor</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        @*  Edição In-Line do Grid. 
+                            Todas as Colunas São Editáveis.
+
+                            <tbody>
                             @for (int i = 0; i < Model.PrecosDeVenda.Count; i++)
                             {
                                 <tr data-index="@i">
@@ -157,6 +160,70 @@
                                     <td>
                                         <input asp-for="PrecosDeVenda[@i].ValorString" class="form-control" asp-format="{0:C}" />
                                         <span asp-validation-for="PrecosDeVenda[@i].ValorString" class="text-danger"></span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody> *@
+
+                        @* 
+                            Ediçao no Grid com Linha Expansível
+                            As Colunas do Grid São Somente Leitura e uma Linha adicional é Exibida com o painel de Edição
+                        *@
+
+                        <tbody id="precosBody">
+                            @for (int i = 0; i < Model.PrecosDeVenda.Count; i++)
+                            {
+                                <tr class="display-row" data-index="@i">
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                                                onclick="toggleEditor(this)">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+
+                                        <input type="hidden" asp-for="PrecosDeVenda[@i].Id" />
+                                        <input type="hidden" asp-for="PrecosDeVenda[@i].MarcadoParaExclusao" />
+                                    </td>
+                                    <td class="tipo-text">@Html.DisplayFor(modelItem => Model.PrecosDeVenda[@i].Tipo)</td>
+                                    <td class="valor-text">@Html.DisplayFor(modelItem => Model.PrecosDeVenda[@i].ValorString)</td>
+                                </tr>
+
+                                <tr class="editor-row d-none" data-index="@i">
+                                    <td colspan="4" class="p-0">
+                                        <div class="bg-body-secondary border-start border-4 border-primary rounded-3 p-3">
+                                            <div class="row mt-2">
+                                                <div class="col-md-4">
+                                                    <label asp-for="PrecosDeVenda[@i].Tipo" class="control-label"></label>
+                                                    <select asp-for="PrecosDeVenda[@i].Tipo"
+                                                            asp-items="Html.GetEnumSelectList<Biblioteca.WebApp.Model.TipoDeVenda>()"
+                                                            class="form-select">
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="row  mt-2">
+                                                <div class="col-md-4">
+                                                    <label asp-for="PrecosDeVenda[@i].ValorString" class="control-label"></label>
+                                                    <input asp-for="PrecosDeVenda[@i].ValorString" class="form-control" asp-format="{0:C}" />
+                                                    <span asp-validation-for="PrecosDeVenda[@i].ValorString" class="text-danger"></span>
+                                                </div>
+                                            </div>
+                                            <div class="row mt-2">
+                                                <div class="col-12 d-flex justify-content-end gap-2">
+                                                    <button type="button"
+                                                            class="btn btn-sm btn-outline-secondary"
+                                                            style="width: 48px; height: 40px;"
+                                                            onclick="confirmarEdicao(this)">
+                                                        <i class="bi bi-check-lg"></i>
+                                                    </button>
+
+                                                    <button type="button"
+                                                            class="btn btn-outline-danger btn-sm p-1"
+                                                            style="width: 48px; height: 40px;"
+                                                            onclick="fecharEditor(this)">
+                                                        <i class="bi bi-door-open"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </td>
                                 </tr>
                             }
@@ -263,87 +330,125 @@
     }
 
     <script>
-        let contador = `@Model.PrecosDeVenda.Count`;
-            let contadorAnexo = `@Model.AnexosDoLivro.Count`;
+                                let contador = `@Model.PrecosDeVenda.Count`;
+                                    let contadorAnexo = `@Model.AnexosDoLivro.Count`;
 
-        const tipoOptions = `@Html.Raw(string.Join("",
-                                                    Enum.GetValues(typeof(Biblioteca.WebApp.Model.TipoDeVenda))
-                                                                                                                    .Cast<Biblioteca.WebApp.Model.TipoDeVenda>()
-                                                                                                                    .Select(e => $"<option value='{(int)e}'>{e}</option>")))`;
+                                const tipoOptions = `@Html.Raw(string.Join("",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            Enum.GetValues(typeof(Biblioteca.WebApp.Model.TipoDeVenda))
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            .Cast<Biblioteca.WebApp.Model.TipoDeVenda>()
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            .Select(e => $"<option value='{(int)e}'>{e}</option>")))`;
 
     function adicionarLinha() {
         const tbody = document.querySelector('table tbody');
 
-            const novaLinha = document.createElement('tr');
-            novaLinha.innerHTML = `
-                <td>
-                    <button type="button" class="btn btn-outline-danger btn-sm p-1"
-                            onclick="this.closest('tr').remove()">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                <input type="hidden" name="PrecosDeVenda[${contador}].Id" value="0" />
-                </td>
-                <td>
-                <select name="PrecosDeVenda[${contador}].Tipo" class="form-select">
-                        ${tipoOptions}
-                    </select>
-                </td>
-                <td>
-                    <input name="PrecosDeVenda[${contador}].ValorString" class="form-control" asp-format="{0:C}"/>
-                    <span asp-validation-for="PrecosDeVenda[${contador}].ValorString" class="text-danger"></span>
-                </td>
-            `;
+                                    const novaLinha = document.createElement('tr');
+                                    novaLinha.innerHTML = `
+                                        <td>
+                                            <button type="button" class="btn btn-outline-danger btn-sm p-1"
+                                                    onclick="this.closest('tr').remove()">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        <input type="hidden" name="PrecosDeVenda[${contador}].Id" value="0" />
+                                        </td>
+                                        <td>
+                                        <select name="PrecosDeVenda[${contador}].Tipo" class="form-select">
+                                                ${tipoOptions}
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input name="PrecosDeVenda[${contador}].ValorString" class="form-control" asp-format="{0:C}"/>
+                                            <span asp-validation-for="PrecosDeVenda[${contador}].ValorString" class="text-danger"></span>
+                                        </td>
+                                    `;
 
-            tbody.appendChild(novaLinha);
-            contador++;
-        };
+                                    tbody.appendChild(novaLinha);
+                                    contador++;
+                                };
 
-        function adicionarAnexo() {
-                        const tbody = document.querySelector('#tabelaAnexos tbody');
+                                function adicionarAnexo() {
+                                                const tbody = document.querySelector('#tabelaAnexos tbody');
 
-                        const novaLinha = document.createElement('tr');
-                        novaLinha.innerHTML = `
-                            <td>
-                                <button type="button" class="btn btn-outline-danger btn-sm p-1"
-                                        onclick="marcarParaExclusao(this, 'AnexosDoLivro');">
-                                    <i class="bi bi-trash"></i>
-                                </button>
+                                                const novaLinha = document.createElement('tr');
+                                                novaLinha.innerHTML = `
+                                                    <td>
+                                                        <button type="button" class="btn btn-outline-danger btn-sm p-1"
+                                                                onclick="marcarParaExclusao(this, 'AnexosDoLivro');">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
 
-                                    <input type="hidden" name="AnexosDoLivro[${contadorAnexo}].Id" value="0"/>
-                                    <input type="hidden" name="AnexosDoLivro[${contadorAnexo}].MarcadoParaExclusao" value="false"/>
-                            </td>
-                            <td>
-                                    <input name="AnexosDoLivro[${contadorAnexo}].Descricao" class="form-control" />
-                                    <span class="text-danger field-validation-valid"
-                                                       data-valmsg-for="AnexosDoLivro[${contadorAnexo}].Descricao"
-                                           data-valmsg-replace="true"></span>
-                            </td>
-                            <td>
-                                    <input name="AnexosDoLivro[${contadorAnexo}].FormFile"
-                                       type="file"
-                                       class="form-control"
-                                       accept="*" />
-                            </td>
-                        `;
+                                                            <input type="hidden" name="AnexosDoLivro[${contadorAnexo}].Id" value="0"/>
+                                                            <input type="hidden" name="AnexosDoLivro[${contadorAnexo}].MarcadoParaExclusao" value="false"/>
+                                                    </td>
+                                                    <td>
+                                                            <input name="AnexosDoLivro[${contadorAnexo}].Descricao" class="form-control" />
+                                                            <span class="text-danger field-validation-valid"
+                                                                               data-valmsg-for="AnexosDoLivro[${contadorAnexo}].Descricao"
+                                                                   data-valmsg-replace="true"></span>
+                                                    </td>
+                                                    <td>
+                                                            <input name="AnexosDoLivro[${contadorAnexo}].FormFile"
+                                                               type="file"
+                                                               class="form-control"
+                                                               accept="*" />
+                                                    </td>
+                                                `;
 
-                        tbody.appendChild(novaLinha);
-                        contadorAnexo++;
-                    }
+                                                tbody.appendChild(novaLinha);
+                                                contadorAnexo++;
+                                            }
 
-        function marcarParaExclusao(button, arrayName) {
-            const row = button.closest('tr');
+                                function marcarParaExclusao(button, arrayName) {
+                                    const row = button.closest('tr');
 
-            const hidden = row.querySelector(
-                `input[type="hidden"][name^="${arrayName}["][name$=".MarcadoParaExclusao"]`
-            );
+                                    const hidden = row.querySelector(
+                                        `input[type="hidden"][name^="${arrayName}["][name$=".MarcadoParaExclusao"]`
+                                    );
 
-            if (!hidden) return;
+                                    if (!hidden) return;
 
-            hidden.value = "true";
+                                    hidden.value = "true";
 
-            row.classList.add('table-danger', 'text-muted');
+                                    row.classList.add('table-danger', 'text-muted');
 
-            button.disabled = true;
-        };
+                                    button.disabled = true;
+                                };
+
+                                // Funções para Abrir e Fechar o Editor com Linha Expansível no Gird
+
+                                function toggleEditor(btn) {
+                                    const row = btn.closest('tr');
+                                    const index = row.dataset.index;
+                                    const editor = document.querySelector(`.editor-row[data-index="${index}"]`);
+                                    editor.classList.toggle('d-none');
+                                }
+
+                                function confirmarEdicao(btn) {
+                                    const editor = btn.closest('.editor-row');
+                                    const index = editor.dataset.index;
+
+                                    // pega valores do painel. Só pega os que forem ser exibidos no grid.
+                                    // No caso do combo, se pegar value vai vir o índice.
+                                    const tipo = editor.querySelector(`[name="PrecosDeVenda[${index}].Tipo"] option:checked`).textContent;
+                                    const valor = editor.querySelector(`[name="PrecosDeVenda[${index}].ValorString"]`).value;
+
+                                    // encontra a linha do grid correspondente
+                                    const row = document.querySelector(`tr[data-index="${index}"]`);
+                                    console.log(row);
+
+                                    // atualiza os inputs que o ASP.NET vai bindar
+                                    row.querySelector('.tipo-text').textContent = tipo;
+                                    row.querySelector('.valor-text').textContent = valor;
+
+                                    fecharEditor(btn);
+                                }
+
+                                function fecharEditor(btn) {
+
+                                    const editor = btn.closest('.editor-row');
+
+                                    editor.classList.add('d-none');
+
+                                    $.validator.unobtrusive.parse(editor);
+                                }
     </script>
 }
