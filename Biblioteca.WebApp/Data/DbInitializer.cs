@@ -50,26 +50,40 @@ namespace Biblioteca.WebApp.Data
                         await roleManager.CreateAsync(new IdentityRole("User"));
                     }
 
-                    var adminUser = await userManager.FindByEmailAsync("anderson.neto.silva@hotmail.com");
-
-                    if (adminUser == null)
+                    var usuarios = new[]
                     {
-                        var user = new IdentityUser
+                        new IdentityUser
                         {
                             UserName = "anderson.neto.silva@hotmail.com",
                             Email = "anderson.neto.silva@hotmail.com",
                             EmailConfirmed = true
-                        };
-
-                        var result = await userManager.CreateAsync(user, "PasswordSegura123!");
-
-                        if (result.Succeeded)
+                        },
+                        new IdentityUser
                         {
-                            await userManager.AddToRoleAsync(user, "Admin");
+                            UserName = "gviegas@hotmail.com",
+                            Email = "gviegas@hotmail.com",
+                            EmailConfirmed = true
                         }
+                    };
+
+
+                    foreach (var usuario in usuarios)
+                    {
+                        var oldUser = await userManager.FindByEmailAsync(usuario.UserName);
+
+                        if (oldUser == null)
+                        {
+                            var result = await userManager.CreateAsync(usuario, "PasswordSegura123!");
+
+                            if (result.Succeeded)
+                            {
+                                await userManager.AddToRoleAsync(usuario, "Admin");
+                            }
+                        }
+                        else
+                            await userManager.AddToRoleAsync(oldUser, "Admin");
                     }
-                    else
-                        await userManager.AddToRoleAsync(adminUser, "Admin");
+
                 }
                 catch (Exception ex)
                 {
