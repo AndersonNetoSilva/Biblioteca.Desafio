@@ -1,0 +1,37 @@
+﻿@model Biblioteca.WebApp.Areas.Admin.Pages.General.Livros.RegistroDeLocacaoVM
+
+@{
+    ViewData.TemplateInfo.HtmlFieldPrefix = $"Locacao.Registros[{Model.Index}]";
+}
+
+<tr data-index="@Model.Index" class="@(Model.Id <=   0 ? "table-warning" : "")">
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="LivroId" />
+    <input type="hidden" asp-for="MarcadoParaExclusao" />
+
+    <td>
+        <button type="button"
+                class="btn btn-outline-danger btn-sm p-1"
+                onclick="marcarParaExclusao(this, 'Locacao.Registros');">
+            <i class="bi bi-trash"></i>
+        </button>
+    </td>
+
+    <td>
+        @Model.Livro?.Titulo
+    </td>
+
+    <td>
+        <input asp-for="DataDeSaida"
+               asp-format="{0:yyyy-MM-ddTHH:mm}"
+               type="datetime-local"
+               class="form-control" />
+    </td>
+
+    <td>
+        <input asp-for="DataDeDevolucao"
+               asp-format="{0:yyyy-MM-ddTHH:mm}"
+               type="datetime-local"
+               class="form-control" />
+    </td>
+</tr>

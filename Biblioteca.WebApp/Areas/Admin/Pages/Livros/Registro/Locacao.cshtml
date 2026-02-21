@@ -1,0 +1,129 @@
+﻿@page
+@model Biblioteca.WebApp.Areas.Admin.Pages.General.Livros.LocacaoModel
+
+@{
+    ViewData["Title"] = "Locação";
+}
+
+<breadcrumb items="Cadastros, Gerais, Livros, Locação"></breadcrumb>
+
+<form method="post">
+    <div class="row">
+        <div class="col-md-12">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <span class="text-danger">*</span>
+                <label asp-for="Locacao.LivroId" class="control-label"></label>
+                <select asp-for="Locacao.LivroId" class="form-select" asp-items="ViewBag.Livros"></select>
+                <span asp-validation-for="Locacao.LivroId" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="form-group">
+                <label asp-for="Locacao.DataDeSaidaInicial" class="control-label"></label>
+                <input asp-for="Locacao.DataDeSaidaInicial" asp-format="{0:yyyy-MM-ddTHH:mm}" type="datetime-local" class="form-control" />
+                <span asp-validation-for="Locacao.DataDeSaidaInicial" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="form-group">
+                <label asp-for="Locacao.DataDeDevolucaoInicial" class="control-label"></label>
+                <input asp-for="Locacao.DataDeDevolucaoInicial" asp-format="{0:yyyy-MM-ddTHH:mm}" type="datetime-local" class="form-control" />
+                <span asp-validation-for="Locacao.DataDeDevolucaoInicial" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="col-md-2 d-flex align-items-end justify-content-end">
+            <button id="btnFiltrar" class="btn btn-primary">Filtrar</button>
+        </div>
+    </div>
+
+    <div id="registrosContainer" class="row mt-3">
+        @await Html.PartialAsync("_RegistrosDeLocacaoGrid", Model.Locacao)
+    </div>
+
+    <div class="row">
+        <div class="form-group mt-3 d-flex justify-content-between">
+            <input type="submit" value="Gravar" class="btn btn-primary" />
+            <a asp-page="./Index" class="btn btn-secondary">Voltar</a>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        function marcarParaExclusao(button, arrayName) {
+            const row = button.closest('tr');
+
+            const hidden = row.querySelector(
+                `input[type="hidden"][name^="${arrayName}["][name$=".MarcadoParaExclusao"]`
+            );
+
+            if (!hidden) return;
+
+            hidden.value = "true";
+
+            row.classList.add('table-danger', 'text-muted');
+
+            button.disabled = true;
+        };
+    </script>
+
+    <script>
+        document.getElementById("btnFiltrar")
+            .addEventListener("click", function (event) {
+                event.preventDefault();
+
+                const livroId = document.getElementById("Locacao_LivroId").value;
+                const dataDeSaidaInicial = document.getElementById("Locacao_DataDeSaidaInicial")?.value;
+                const dataDeDevolucaoInicial = document.getElementById("Locacao_DataDeDevolucaoInicial")?.value;
+
+                carregarRegistros(livroId, dataDeSaidaInicial, dataDeDevolucaoInicial);
+            });
+    </script>
+
+    <script>
+        async function carregarRegistros(livroId, dataDeSaidaInicial, dataDeDevolucaoInicial) {
+            const params = new URLSearchParams({
+                handler: "FillRegistrosDeLocacao",
+                livroId: livroId
+            });
+
+            if (dataDeSaidaInicial) params.append("dataDeSaidaInicial", dataDeSaidaInicial);
+            if (dataDeDevolucaoInicial) params.append("dataDeDevolucaoInicial", dataDeDevolucaoInicial);
+
+            const response = await fetch(`?${params.toString()}`);
+            const html = await response.text();
+
+            document.getElementById("registrosContainer").innerHTML = html;
+        }
+
+        async function adicionarRegistro() {
+
+            const livroId = document.getElementById("Locacao_LivroId").value;
+            const tbody = document.getElementById("det-registros");
+            const index = tbody.querySelectorAll("tr").length;
+
+            const params = new URLSearchParams({
+                handler: "NewRegistroDeLocacao",
+                index: index,
+                livroId: livroId
+            });
+
+            const response = await fetch(`?${params.toString()}`);
+            const html = await response.text();
+
+            tbody.insertAdjacentHTML("afterbegin", html);
+        }
+    </script>
+}
